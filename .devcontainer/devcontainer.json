@@ -8,9 +8,7 @@
 		"ghcr.io/devcontainers/features/aws-cli:1": {},
 		"ghcr.io/devcontainers/features/github-cli:1": {},
 		"ghcr.io/devcontainers/features/terraform:1": {},
-		"ghcr.io/oleksis/devcontainer-features/python-launcher:1": {},
-		"ghcr.io/joshuanianji/devcontainer-features/aws-cli-persistence:1": {},
-		"ghcr.io/joshuanianji/devcontainer-features/terraform-cli-persistence:1": {}
+		"ghcr.io/stu-bell/devcontainer-features/python:0": {}
 	}
 
 	// Features to add to the dev container. More info: https://containers.dev/features.

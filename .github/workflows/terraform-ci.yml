@@ -21,7 +21,7 @@ env:
   TF_BACKEND_KEY: ${{ vars.TF_BACKEND_S3_KEY }}
   TF_BACKEND_DDB_TABLE: ${{ vars.TF_BACKEND_DDB_TABLE }}
   AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
-  # TF_VAR_vpc_cidr: ${{ vars.VPC_CIDR }} # TODO: uncomment and set VPC_CIDR if the VPC is needed to be created via TF
+  TF_VAR_ad_connector_password: ${{ secrets.AD_CONNECTOR_PASSWORD }}
 
 jobs:
   Terraform:
