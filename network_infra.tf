@@ -100,7 +100,7 @@ data "aws_availability_zones" "available" {
 }
 #### create subnets in evs-vpc and workspaces-vpc on AZ1 and AZ2
 resource "aws_subnet" "evs_vpc_subnets" {
-  count             = 2 # Number of subnets --> Ajust this number based on the number of subnets needed
+  count             = 1 # Number of subnets --> Ajust this number based on the number of subnets needed
   vpc_id            = data.aws_vpc.evs.id
   cidr_block        = cidrsubnet(var.evs_vpc_cidr, 7, count.index)
   availability_zone = data.aws_availability_zones.available.names[count.index % length(data.aws_availability_zones.available.names)]
