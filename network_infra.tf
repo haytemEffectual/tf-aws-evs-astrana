@@ -104,7 +104,7 @@ resource "aws_subnet" "evs_vpc_subnets" {
   cidr_block        = cidrsubnet(var.evs_vpc_cidr, 7, count.index)
   availability_zone = data.aws_availability_zones.available.names[count.index % length(data.aws_availability_zones.available.names)]
   tags = {
-    Name = "evs-vpc-subnet-${count.index + 1}"
+    Name = "usw2a-evs-service-access-subnet"
   }
 }
 resource "aws_subnet" "workspaces_vpc_subnets" {
@@ -113,7 +113,7 @@ resource "aws_subnet" "workspaces_vpc_subnets" {
   cidr_block        = cidrsubnet(var.workspaces_vpc_cidr, 4, count.index)
   availability_zone = data.aws_availability_zones.available.names[count.index % length(data.aws_availability_zones.available.names)]
   tags = {
-    Name = "workspaces-vpc-subnet-${count.index + 1}"
+    Name = "workspaces-svc-subnet-${count.index + 1}"
   }
 }
 
@@ -126,7 +126,7 @@ resource "aws_subnet" "workspaces_vpc_subnets" {
 resource "aws_route_table" "evs_vpc_private_rt" {
   vpc_id = data.aws_vpc.evs.id
   tags = {
-    Name = "evs-vpc-private-rt"
+    Name = "evs-svc-subnet-rt"
   }
 }
 
@@ -134,7 +134,7 @@ resource "aws_route_table" "evs_vpc_private_rt" {
 resource "aws_route_table" "workspaces_vpc_private_rt" {
   vpc_id = data.aws_vpc.workspaces.id
   tags = {
-    Name = "workspaces-vpc-private-rt"
+    Name = "workspaces-svc-subnet-rt"
   }
 }
 
