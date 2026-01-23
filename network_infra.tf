@@ -69,7 +69,6 @@ data "aws_vpc" "workspaces" {
 resource "aws_vpc_peering_connection" "evsvpc_workspacesvpc" {
   vpc_id      = data.aws_vpc.evs.id
   peer_vpc_id = data.aws_vpc.workspaces.id
-  peer_region = "us-west-2"
   auto_accept = true
   tags = {
     Name        = "evs-vpc--workspaces-vpc"
