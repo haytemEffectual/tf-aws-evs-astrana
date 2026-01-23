@@ -71,7 +71,7 @@ resource "aws_vpc_peering_connection" "evsvpc_workspacesvpc" {
   peer_vpc_id = data.aws_vpc.workspaces.id
   auto_accept = true
   tags = {
-    Name        = "Evs-workspaces"
+    Name        = "evs-vpc--workspaces-vpc"
     Environment = var.environment
   }
 }
