@@ -1,0 +1,15 @@
+terraform init \
+  -backend-config="bucket=tf-aws-evs-astrana-tfstate-747025127203-us-west-2" \
+  -backend-config="key=global/terraform.tfstate" \
+  -backend-config="region=us-west-2" \
+  -backend-config="dynamodb_table=tf-aws-evs-astrana-tf-locks" \
+  -backend-config="encrypt=true"
+
+
+
+  terraform plan \
+  -backend-config="bucket=tf-aws-evs-astrana-tfstate-747025127203-us-west-2" \
+  -backend-config="key=global/terraform.tfstate" \
+  -backend-config="region=us-west-2" \
+  -backend-config="dynamodb_table=tf-aws-evs-astrana-tf-locks" \
+  -backend-config="encrypt=true"
