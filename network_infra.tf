@@ -113,7 +113,7 @@ resource "aws_subnet" "workspaces_vpc_subnets" {
   cidr_block        = cidrsubnet(var.workspaces_vpc_cidr, 4, count.index)
   availability_zone = data.aws_availability_zones.available.names[count.index % length(data.aws_availability_zones.available.names)]
   tags = {
-    Name = "workspaces-svc-subnet-${count.index + 1}"
+    Name = "usw${substr(data.aws_availability_zones.available.names[count.index % length(data.aws_availability_zones.available.names)], -2, 2)}-workspaces-svc-subnet"
   }
 }
 
