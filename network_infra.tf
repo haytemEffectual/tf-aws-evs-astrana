@@ -72,7 +72,7 @@ resource "aws_vpc_peering_connection" "evsvpc_workspacesvpc" {
   peer_region = "us-west-2"
   auto_accept = true
   tags = {
-    Name        = "Evs-workspaces"
+    Name        = "evs-vpc--workspaces-vpc"
     Environment = var.environment
   }
 }
