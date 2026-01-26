@@ -130,6 +130,12 @@ resource "aws_route_table" "evs_vpc_private_rt" {
   }
 }
 
+#### Set EVS route table as main route table
+resource "aws_main_route_table_association" "evs_vpc_main" {
+  vpc_id         = data.aws_vpc.evs.id
+  route_table_id = aws_route_table.evs_vpc_private_rt.id
+}
+
 #### ctreate route tables for WorkSpaces VPC
 resource "aws_route_table" "workspaces_vpc_private_rt" {
   vpc_id = data.aws_vpc.workspaces.id
