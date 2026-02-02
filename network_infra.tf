@@ -44,7 +44,7 @@ resource "aws_vpc" "workspaces" {
   }
 }
 
-# Data sources to read the VPC IDs -- those datassources were added to read the pre-existed VPCs in prod env in case they are not created by this code.
+#  Data sources to read the VPC IDs -- those datassources were added to read the pre-existed VPCs in prod env in case they are not created by this code.
 data "aws_vpc" "evs" {
   depends_on = [aws_vpc.evs]
   filter {
