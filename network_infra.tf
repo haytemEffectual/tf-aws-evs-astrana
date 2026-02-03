@@ -254,7 +254,7 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "evs-vpc" {
   transit_gateway_id = var.transit_gateway_id
   vpc_id             = data.aws_vpc.evs.id
   tags = {
-    Name        = "evs-vpc-TGW-Attachment"
+    Name        = "evs-vpc-tgw-Attachment"
     Environment = var.environment
   }
 }
@@ -280,7 +280,7 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "workspaces" {
   transit_gateway_id = var.transit_gateway_id
   vpc_id             = data.aws_vpc.workspaces.id
   tags = {
-    Name        = "workspaces-vpc-TGW-Attachment"
+    Name        = "workspaces-vpc-tgw-Attachment"
     Environment = var.environment
   }
 }
