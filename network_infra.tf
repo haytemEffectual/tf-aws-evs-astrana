@@ -186,19 +186,10 @@ resource "aws_route" "evsvpc_default_route" {
   ]
 }
 
-resource "aws_route" "evsvpc_tgw_10_1_6_0" {
+resource "aws_route" "evsvpc_onprem_cidrs" {
+  for_each = toset(var.on_premises_cidrs)
   route_table_id         = aws_route_table.evs_vpc_private_rt.id
-  destination_cidr_block = "10.1.6.0/24"
-  transit_gateway_id     = var.transit_gateway_id
-  depends_on = [
-    data.aws_ec2_transit_gateway_vpc_attachments.evs,
-    aws_ec2_transit_gateway_vpc_attachment.evs-vpc
-  ]
-}
-
-resource "aws_route" "evsvpc_tgw_10_1_7_0" {
-  route_table_id         = aws_route_table.evs_vpc_private_rt.id
-  destination_cidr_block = "10.1.7.0/24"
+  destination_cidr_block = each.value
   transit_gateway_id     = var.transit_gateway_id
   depends_on = [
     data.aws_ec2_transit_gateway_vpc_attachments.evs,
