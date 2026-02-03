@@ -1,7 +1,7 @@
 # here will be project specific variables
 aws_region            = "us-west-2"
 environment           = "prod"
-on_premises_cidr      = "192.168.0.0/16" # TODO: wating on Astrana health to provide  
+on_premises_cidrs     = ["10.1.6.0/24", "10.1.7.0/24"]
 transit_gateway_id    = "tgw-007d8d4536850ff23"
 evs_vpc_cidr          = "10.210.0.0/17" # CIDR for EVS VPC,        prefix will be added +4 bits for subnets
 workspaces_vpc_cidr   = "10.211.0.0/20" # CIDR for WorkSpaces VPC, prefix will be added +4 bits for subnets

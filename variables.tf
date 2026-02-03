@@ -23,9 +23,9 @@ variable "workspaces_vpc_cidr" {
   type = string
 }
 
-variable "on_premises_cidr" {
-  description = "On-premises CIDR block"
-  type        = string
+variable "on_premises_cidrs" {
+  description = "On-premises CIDR blocks"
+  type        = list(string)
 }
 variable "transit_gateway_id" {
   description = "Transit Gateway ID"
@@ -52,10 +52,12 @@ variable "ad_connector_username" {
   description = "Service account username for AD Connector"
   type        = string
 }
-variable "ad_connector_password" {
-  description = "Service account password for AD Connector"
-  type        = string
-  sensitive   = true
-}
+
+# TODO: Uncomment this when password is available and provide the AD Connector password via GitHub Secrets
+# variable "ad_connector_password" {
+#   description = "Service account password for AD Connector"
+#   type        = string
+#   sensitive   = true
+# }
 
 
