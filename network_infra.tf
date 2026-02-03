@@ -66,7 +66,7 @@ output "evs_vpc_id" {
 }
 output "workspaces_vpc_id" {
   value = data.aws_vpc.workspaces.id
-} 
+}
 
 #####################################################################################
 ############################# CONFIGURING VPC PEERING CONNECTION ####################
