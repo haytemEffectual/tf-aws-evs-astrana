@@ -254,10 +254,6 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "evs-vpc" {
   transit_gateway_id = var.transit_gateway_id
   vpc_id             = data.aws_vpc.evs.id
 
-  lifecycle {
-    prevent_destroy = true
-  }
-
   tags = {
     Name        = "evs-vpc-tgw-Attachment"
     Environment = var.environment
@@ -266,28 +262,24 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "evs-vpc" {
 
 # #TODO: uncomment the folloing section after Asstrana team creates the TGW and it is ready to use 
 # Get existing TGW VPC attachment for workspaces-VPC (if exists) 
-data "aws_ec2_transit_gateway_vpc_attachments" "workspaces" {
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.workspaces.id]
-  }
-  filter {
-    name   = "transit-gateway-id"
-    values = [var.transit_gateway_id]
-  }
-}
+# data "aws_ec2_transit_gateway_vpc_attachments" "workspaces" {
+#   filter {
+#     name   = "vpc-id"
+#     values = [data.aws_vpc.workspaces.id]
+#   }
+#   filter {
+#     name   = "transit-gateway-id"
+#     values = [var.transit_gateway_id]
+#   }
+# }
 
 #### Create TGW VPC attachment for workspaces-VPC (if it doesn't exist)
 resource "aws_ec2_transit_gateway_vpc_attachment" "workspaces" {
-  count = length(data.aws_ec2_transit_gateway_vpc_attachments.workspaces.ids) == 0 ? 1 : 0
+  # count = length(data.aws_ec2_transit_gateway_vpc_attachments.workspaces.ids) == 0 ? 1 : 0
   # You'll need to provide EVS VPC TGW subnet IDs
   subnet_ids         = aws_subnet.workspaces_vpc_subnets[*].id
   transit_gateway_id = var.transit_gateway_id
   vpc_id             = data.aws_vpc.workspaces.id
-
-  lifecycle {
-    prevent_destroy = true
-  }
 
   tags = {
     Name        = "workspaces-vpc-tgw-Attachment"
