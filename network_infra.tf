@@ -187,7 +187,7 @@ resource "aws_route" "evsvpc_default_route" {
 }
 
 resource "aws_route" "evsvpc_onprem_cidrs" {
-  for_each = toset(var.on_premises_cidrs)
+  for_each               = toset(var.on_premises_cidrs)
   route_table_id         = aws_route_table.evs_vpc_private_rt.id
   destination_cidr_block = each.value
   transit_gateway_id     = var.transit_gateway_id
