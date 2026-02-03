@@ -186,27 +186,27 @@ resource "aws_route" "evsvpc_default_route" {
   ]
 }
 
-resource "aws_route" "evsvpc_onprem_cidrs" {
-  for_each               = toset(var.on_premises_cidrs)
-  route_table_id         = aws_route_table.evs_vpc_private_rt.id
-  destination_cidr_block = each.value
-  transit_gateway_id     = var.transit_gateway_id
-  depends_on = [
-    data.aws_ec2_transit_gateway_vpc_attachments.evs,
-    aws_ec2_transit_gateway_vpc_attachment.evs-vpc
-  ]
-}
-
-# #### Add TGW routes on workspaces vpc for on-premises access
-# resource "aws_route" "workspacesvpc_default_route" {
-#   route_table_id         = aws_route_table.workspaces_vpc_private_rt.id
-#   destination_cidr_block = "0.0.0.0/0"
+# resource "aws_route" "evsvpc_onprem_cidrs" {
+#   for_each               = toset(var.on_premises_cidrs)
+#   route_table_id         = aws_route_table.evs_vpc_private_rt.id
+#   destination_cidr_block = each.value
 #   transit_gateway_id     = var.transit_gateway_id
 #   depends_on = [
-#     data.aws_ec2_transit_gateway_vpc_attachments.workspaces,
-#     aws_ec2_transit_gateway_vpc_attachment.workspaces
+#     data.aws_ec2_transit_gateway_vpc_attachments.evs,
+#     aws_ec2_transit_gateway_vpc_attachment.evs-vpc
 #   ]
 # }
+
+#### Add TGW routes on workspaces vpc for on-premises access
+resource "aws_route" "workspacesvpc_default_route" {
+  route_table_id         = aws_route_table.workspaces_vpc_private_rt.id
+  destination_cidr_block = "0.0.0.0/0"
+  transit_gateway_id     = var.transit_gateway_id
+  depends_on = [
+    data.aws_ec2_transit_gateway_vpc_attachments.workspaces,
+    aws_ec2_transit_gateway_vpc_attachment.workspaces
+  ]
+}
 
 # #TODO: uncomment the folloing section after Asstrana team creates AD and provides the DNS IPs
 # #####################################################################################
@@ -260,30 +260,30 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "evs-vpc" {
 }
 
 # #TODO: uncomment the folloing section after Asstrana team creates the TGW and it is ready to use 
-# # Get existing TGW VPC attachment for workspaces-VPC (if exists)
-# data "aws_ec2_transit_gateway_vpc_attachments" "workspaces" {
-#   filter {
-#     name   = "vpc-id"
-#     values = [data.aws_vpc.workspaces.id]
-#   }
-#   filter {
-#     name   = "transit-gateway-id"
-#     values = [var.transit_gateway_id]
-#   }
-# }
+# Get existing TGW VPC attachment for workspaces-VPC (if exists)
+data "aws_ec2_transit_gateway_vpc_attachments" "workspaces" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.workspaces.id]
+  }
+  filter {
+    name   = "transit-gateway-id"
+    values = [var.transit_gateway_id]
+  }
+}
 
 #### Create TGW VPC attachment for workspaces-VPC (if it doesn't exist)
-# resource "aws_ec2_transit_gateway_vpc_attachment" "workspaces" {
-#   count = length(data.aws_ec2_transit_gateway_vpc_attachments.workspaces.ids) == 0 ? 1 : 0
-#   # You'll need to provide EVS VPC TGW subnet IDs
-#   subnet_ids         = aws_subnet.workspaces_vpc_subnets[*].id
-#   transit_gateway_id = var.transit_gateway_id
-#   vpc_id             = data.aws_vpc.workspaces.id
-#   tags = {
-#     Name        = "workspaces-vpc-TGW-Attachment"
-#     Environment = var.environment
-#   }
-# }
+resource "aws_ec2_transit_gateway_vpc_attachment" "workspaces" {
+  count = length(data.aws_ec2_transit_gateway_vpc_attachments.workspaces.ids) == 0 ? 1 : 0
+  # You'll need to provide EVS VPC TGW subnet IDs
+  subnet_ids         = aws_subnet.workspaces_vpc_subnets[*].id
+  transit_gateway_id = var.transit_gateway_id
+  vpc_id             = data.aws_vpc.workspaces.id
+  tags = {
+    Name        = "workspaces-vpc-TGW-Attachment"
+    Environment = var.environment
+  }
+}
 
 
 

@@ -23,10 +23,11 @@ variable "workspaces_vpc_cidr" {
   type = string
 }
 
-variable "on_premises_cidrs" {
-  description = "On-premises CIDR blocks"
-  type        = list(string)
-}
+# variable "on_premises_cidrs" {
+#   description = "On-premises CIDR blocks"
+#   type        = list(string)
+# }
+
 variable "transit_gateway_id" {
   description = "Transit Gateway ID"
   type        = string
