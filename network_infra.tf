@@ -61,13 +61,6 @@ data "aws_vpc" "workspaces" {
   }
 }
 
-output "evs_vpc_id" {
-  value = data.aws_vpc.evs.id
-}
-output "workspaces_vpc_id" {
-  value = data.aws_vpc.workspaces.id
-}
-
 #####################################################################################
 ############################# CONFIGURING VPC PEERING CONNECTION ####################
 #####################################################################################

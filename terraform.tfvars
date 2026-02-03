@@ -2,7 +2,7 @@
 aws_region            = "us-west-2"
 environment           = "prod"
 on_premises_cidr      = "192.168.0.0/16" # TODO: wating on Astrana health to provide  
-transit_gateway_id    = "igw-00cf7a3de66641602"
+transit_gateway_id    = "tgw-007d8d4536850ff23"
 evs_vpc_cidr          = "10.210.0.0/17" # CIDR for EVS VPC,        prefix will be added +4 bits for subnets
 workspaces_vpc_cidr   = "10.211.0.0/20" # CIDR for WorkSpaces VPC, prefix will be added +4 bits for subnets
 domain_name           = "corp.Astrana.com"
