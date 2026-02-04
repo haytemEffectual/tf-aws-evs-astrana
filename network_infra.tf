@@ -205,27 +205,42 @@ resource "aws_route" "workspacesvpc_default_route" {
   ]
 }
 
-# #TODO: uncomment the folloing section after Asstrana team creates AD and provides the DNS IPs
-# #####################################################################################
-# ###################### CONFIGURING DHCP OPTIONS ON BOTH VPCs  #######################
-# #####################################################################################
-# #### Create DHCP Options Set for workspaces VPC to point to EVS VPC AD DNS IPs
-# resource "aws_vpc_dhcp_options" "workspaces_vpc" {
-#   domain_name         = var.domain_name
-#   domain_name_servers = var.ad_dns_ips
-#   tags = {
-#     Name        = "workspaces-vpc-DHCP"
-#     Environment = "Production"
-#   }
-# }
+#TODO: uncomment the folloing section after Asstrana team creates AD and provides the DNS IPs
+#####################################################################################
+###################### CONFIGURING DHCP OPTIONS ON BOTH VPCs  #######################
+#####################################################################################
+#### Create DHCP Options Set for workspaces VPC to point to EVS VPC AD DNS IPs
+resource "aws_vpc_dhcp_options" "workspaces_vpc" {
+  domain_name         = var.domain_name          # e.g., "corp.example.com"
+  domain_name_servers = var.ad_dns_ips           # AD DNS IPs in EVS VPC
+  ntp_servers         = var.ad_dns_ips           # Optional: Use AD servers for NTP
+  tags = {
+    Name        = "workspaces-vpc-dhcp-options"
+    Environment = var.environment
+    description = "DHCP options for WorkSpaces VPC for DNS on EVS VPC"
+  }
+}
 
-# # Associate DHCP Options with workspaces VPC
-# resource "aws_vpc_dhcp_options_association" "workspaces_vpc" {
-#   vpc_id          = data.aws_vpc.workspaces.id
-#   dhcp_options_id = aws_vpc_dhcp_options.workspaces_vpc.id
-# }
+resource "aws_vpc_dhcp_options_association" "workspaces_vpc" {
+  vpc_id          = data.aws_vpc.workspaces.id
+  dhcp_options_id = aws_vpc_dhcp_options.workspaces_vpc.id
+}
 
+#### Create DHCP Options Set for EVS VPC
+resource "aws_vpc_dhcp_options" "evs_vpc" {
+  domain_name         = var.domain_name          # Same domain
+  domain_name_servers = var.ad_dns_ips           # Your AD DNS IPs (local)
+  tags = {
+    Name        = "evs-vpc-dhcp-options"
+    Environment = var.environment
+    description = "DHCP options for EVS VPC for the local DNS on EVS VPC"
+  }
+}
 
+resource "aws_vpc_dhcp_options_association" "evs_vpc" {
+  vpc_id          = data.aws_vpc.evs.id
+  dhcp_options_id = aws_vpc_dhcp_options.evs_vpc.id
+}
 
 #####################################################################################
 ######################### TRANSIT GATEWAY CONFIGURATION ##############################
