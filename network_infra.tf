@@ -232,7 +232,7 @@ resource "aws_vpc_dhcp_options" "evs_vpc" {
   domain_name_servers = [for i, ip in var.ad_dns_ips : ip if i > 0]
   ntp_servers         = [for i, ip in var.ad_dns_ips : ip if i > 0]
   tags = {
-    Name        = "evs-vpc-dhcp-options"
+    Name        = "evs-vpc-dhcp-options-dc01"
     Environment = var.environment
     description = "DHCP options for EVS VPC for the local DNS on EVS VPC"
   }
