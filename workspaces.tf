@@ -82,6 +82,11 @@
 #     Environment = "Production"
 #   }
 # }
+
+
+
+
+
 # # Example WorkSpace
 # # resource "aws_workspaces_workspace" "example" {
 # #   depends_on   = [aws_workspaces_directory.main]
