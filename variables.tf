@@ -49,16 +49,11 @@ variable "ad_dns_ips" {
   description = "DNS IP addresses of AD servers in EVS VPC"
   type        = list(string)
 }
-variable "ad_connector_username" {
-  description = "Service account username for AD Connector"
+variable "ad_connector_creds_secret_arn" {
+  description = "ARN of the Secrets Manager secret containing AD Connector credentials"
   type        = string
 }
 
-# TODO: Uncomment this when password is available and provide the AD Connector password via GitHub Secrets
-# variable "ad_connector_password" {
-#   description = "Service account password for AD Connector"
-#   type        = string
-#   sensitive   = true
-# }
+
 
 
