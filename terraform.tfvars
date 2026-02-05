@@ -7,7 +7,6 @@ evs_vpc_cidr          = "10.210.0.0/17" # CIDR for EVS VPC,        prefix will b
 workspaces_vpc_cidr   = "10.211.0.0/20" # CIDR for WorkSpaces VPC, prefix will be added +4 bits for subnets
 domain_name           = "alliedipa.int"
 domain_short_name     = "alliedipa"
-default_ou            = "OU=workspaces,DC=alliedipa,DC=int"
+default_ou            = "OU=Workspaces,DC=alliedipa,DC=int"
 ad_dns_ips            = ["10.210.20.10", "10.1.7.12", "10.1.7.13"] # 
-ad_connector_username = "svc-adconnector"                          # TODO: update with the actual AD Connector username
-# ad_connector_password = "000000000000"  # TODO: update with actual password when available, this should be provided via GitHub Secrets"
+ad_connector_creds_secret_arn = "arn:aws:secretsmanager:us-west-2:747025127203:secret:ad_connector_sa-j5Ducj"
