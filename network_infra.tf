@@ -125,7 +125,7 @@ resource "aws_subnet" "workspaces_vpc_subnets" {
 resource "aws_route_table" "evs_vpc_private_rt" {
   vpc_id = data.aws_vpc.evs.id
   tags = {
-    Name = "evs-svc-subnet-rt"
+    Name = "evs-main-rt"
   }
 }
 
@@ -139,7 +139,7 @@ resource "aws_main_route_table_association" "evs_vpc_main" {
 resource "aws_route_table" "workspaces_vpc_private_rt" {
   vpc_id = data.aws_vpc.workspaces.id
   tags = {
-    Name = "workspaces-svc-subnet-rt"
+    Name = "workspaces-main-rt"
   }
 }
 
