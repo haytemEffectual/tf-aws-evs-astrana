@@ -215,7 +215,7 @@ resource "aws_vpc_dhcp_options" "workspaces_vpc" {
   domain_name_servers = var.ad_dns_ips  # AD DNS IPs in EVS VPC
   ntp_servers         = var.ad_dns_ips  # Optional: Use AD servers for NTP
   tags = {
-    Name        = "workspaces-vpc-dhcp-options"
+    Name        = "workspaces-vpc-dhcp-option-set"
     Environment = var.environment
     description = "DHCP options for WorkSpaces VPC for DNS on EVS VPC"
   }
@@ -229,10 +229,10 @@ resource "aws_vpc_dhcp_options_association" "workspaces_vpc" {
 #### Create DHCP Options Set for EVS VPC
 resource "aws_vpc_dhcp_options" "evs_vpc" {
   domain_name         = var.domain_name # Same domain
-  domain_name_servers = [for i, ip in var.ad_dns_ips : ip if i > 0]
-  ntp_servers         = [for i, ip in var.ad_dns_ips : ip if i > 0]
+  domain_name_servers = var.ad_dns_ips
+  ntp_servers         = var.ad_dns_ips
   tags = {
-    Name        = "evs-vpc-dhcp-options-dc01"
+    Name        = "evs-vpc-dhcp-option-set"
     Environment = var.environment
     description = "DHCP options for EVS VPC for the local DNS on EVS VPC"
   }
