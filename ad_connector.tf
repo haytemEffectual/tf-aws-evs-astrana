@@ -35,191 +35,201 @@ resource "time_sleep" "wait_for_ad_connector" {
   create_duration = "420s" # Wait 7 minutes for AD Connector to be ready
 }
 
-# #######  Security Group for AD Connector in WorkSpaces VPC
-# resource "aws_security_group" "ad_connector" {
-#   name_prefix = "workspaces-ad-connector-"
-#   description = "Security group for AD Connector in WorkSpaces VPC"
-#   vpc_id      = aws_vpc.workspaces.id
-#   tags = {
-#     Name        = "WorkSpaces-AD-Connector-SG"
-#     Environment = "Production"
-#   }
-# }
+# Data source to retrieve AWS-managed security group
+data "aws_security_group" "ad_connector" {
+  depends_on = [time_sleep.wait_for_ad_connector]
 
-# # Egress rules for AD Connector security group
-# # DNS TCP to EVS VPC
-# resource "aws_security_group_rule" "ad_connector_dns_tcp" {
-#   type              = "egress"
-#   from_port         = 53
-#   to_port           = 53
-#   protocol          = "tcp"
-#   cidr_blocks       = [var.evs_vpc_cidr]
-#   security_group_id = aws_security_group.ad_connector.id
-#   description       = "DNS to EVS VPC"
-# }
+  filter {
+    name   = "vpc-id"
+    values = [aws_vpc.workspaces.id]
+  }
+  filter {
+    name   = "group-name"
+    values = ["${aws_directory_service_directory.ad_connector.id}_controllers"]
+  }
+}
 
-# # DNS UDP to EVS VPC
-# resource "aws_security_group_rule" "ad_connector_dns_udp" {
-#   type              = "egress"
-#   from_port         = 53
-#   to_port           = 53
-#   protocol          = "udp"
-#   cidr_blocks       = [var.evs_vpc_cidr]
-#   security_group_id = aws_security_group.ad_connector.id
-#   description       = "DNS UDP to EVS VPC"
-# }
 
-# # Kerberos TCP to EVS VPC
-# resource "aws_security_group_rule" "ad_connector_kerberos_tcp" {
-#   type              = "egress"
-#   from_port         = 88
-#   to_port           = 88
-#   protocol          = "tcp"
-#   cidr_blocks       = [var.evs_vpc_cidr]
-#   security_group_id = aws_security_group.ad_connector.id
-#   description       = "Kerberos to EVS VPC"
-# }
+resource "aws_ec2_tag" "ad_connector_sg_name" {
+  resource_id = data.aws_security_group.ad_connector.id
+  key         = "Name"
+  value       = "workspaces-ad-connector-sg"
+}
 
-# # Kerberos UDP to EVS VPC
-# resource "aws_security_group_rule" "ad_connector_kerberos_udp" {
-#   type              = "egress"
-#   from_port         = 88
-#   to_port           = 88
-#   protocol          = "udp"
-#   cidr_blocks       = [var.evs_vpc_cidr]
-#   security_group_id = aws_security_group.ad_connector.id
-#   description       = "Kerberos UDP to DC in EVS VPC"
-# }
+# Egress rules for AD Connector security group
+# DNS TCP to EVS VPC
+resource "aws_security_group_rule" "ad_connector_dns_tcp" {
+  type              = "egress"
+  from_port         = 53
+  to_port           = 53
+  protocol          = "tcp"
+  cidr_blocks       = [var.evs_vpc_cidr]
+  security_group_id = data.aws_security_group.ad_connector.id
+  description       = "DNS to EVS VPC"
+}
 
-# # Network time protocol
-# resource "aws_security_group_rule" "ad_connector_ntp" {
-#   type              = "egress"
-#   from_port         = 123
-#   to_port           = 123
-#   protocol          = "udp"
-#   cidr_blocks       = [var.evs_vpc_cidr]
-#   security_group_id = aws_security_group.ad_connector.id
-#   description       = "Network time protocol to DC in EVS VPC"
-# }
+# DNS UDP to EVS VPC
+resource "aws_security_group_rule" "ad_connector_dns_udp" {
+  type              = "egress"
+  from_port         = 53
+  to_port           = 53
+  protocol          = "udp"
+  cidr_blocks       = [var.evs_vpc_cidr]
+  security_group_id = data.aws_security_group.ad_connector.id
+  description       = "DNS UDP to EVS VPC"
+}
 
-# # RPC Endpoint Mapper to EVS VPC
-# resource "aws_security_group_rule" "ad_connector_rpc" {
-#   type              = "egress"
-#   from_port         = 135
-#   to_port           = 135
-#   protocol          = "tcp"
-#   cidr_blocks       = [var.evs_vpc_cidr]
-#   security_group_id = aws_security_group.ad_connector.id
-#   description       = "RPC Endpoint Mapper to DC in EVS VPC"
-# }
+# Kerberos TCP to EVS VPC
+resource "aws_security_group_rule" "ad_connector_kerberos_tcp" {
+  type              = "egress"
+  from_port         = 88
+  to_port           = 88
+  protocol          = "tcp"
+  cidr_blocks       = [var.evs_vpc_cidr]
+  security_group_id = data.aws_security_group.ad_connector.id
+  description       = "Kerberos to EVS VPC"
+}
 
-# # LDAP TCP to EVS VPC
-# resource "aws_security_group_rule" "ad_connector_ldap_tcp" {
-#   type              = "egress"
-#   from_port         = 389
-#   to_port           = 389
-#   protocol          = "tcp"
-#   cidr_blocks       = [var.evs_vpc_cidr]
-#   security_group_id = aws_security_group.ad_connector.id
-#   description       = "LDAP to DC in EVS VPC"
-# }
+# Kerberos UDP to EVS VPC
+resource "aws_security_group_rule" "ad_connector_kerberos_udp" {
+  type              = "egress"
+  from_port         = 88
+  to_port           = 88
+  protocol          = "udp"
+  cidr_blocks       = [var.evs_vpc_cidr]
+  security_group_id = data.aws_security_group.ad_connector.id
+  description       = "Kerberos UDP to DC in EVS VPC"
+}
 
-# # LDAP UDP to EVS VPC
-# resource "aws_security_group_rule" "ad_connector_ldap_udp" {
-#   type              = "egress"
-#   from_port         = 389
-#   to_port           = 389
-#   protocol          = "udp"
-#   cidr_blocks       = [var.evs_vpc_cidr]
-#   security_group_id = aws_security_group.ad_connector.id
-#   description       = "LDAP UDP to DC in EVS VPC"
-# }
+# Network time protocol
+resource "aws_security_group_rule" "ad_connector_ntp" {
+  type              = "egress"
+  from_port         = 123
+  to_port           = 123
+  protocol          = "udp"
+  cidr_blocks       = [var.evs_vpc_cidr]
+  security_group_id = data.aws_security_group.ad_connector.id
+  description       = "Network time protocol to DC in EVS VPC"
+}
 
-# # SMB to EVS VPC
-# resource "aws_security_group_rule" "ad_connector_smb_445_tcp" {
-#   type              = "egress"
-#   from_port         = 445
-#   to_port           = 445
-#   protocol          = "tcp"
-#   cidr_blocks       = [var.evs_vpc_cidr]
-#   security_group_id = aws_security_group.ad_connector.id
-#   description       = "SMB to DC in EVS VPC"
-# }
+# RPC Endpoint Mapper to EVS VPC
+resource "aws_security_group_rule" "ad_connector_rpc" {
+  type              = "egress"
+  from_port         = 135
+  to_port           = 135
+  protocol          = "tcp"
+  cidr_blocks       = [var.evs_vpc_cidr]
+  security_group_id = data.aws_security_group.ad_connector.id
+  description       = "RPC Endpoint Mapper to DC in EVS VPC"
+}
 
-# resource "aws_security_group_rule" "ad_connector_smb_445_udp" {
-#   type              = "egress"
-#   from_port         = 445
-#   to_port           = 445
-#   protocol          = "udp"
-#   cidr_blocks       = [var.evs_vpc_cidr]
-#   security_group_id = aws_security_group.ad_connector.id
-#   description       = "SMB to DC in EVS VPC"
-# }
+# LDAP TCP to EVS VPC
+resource "aws_security_group_rule" "ad_connector_ldap_tcp" {
+  type              = "egress"
+  from_port         = 389
+  to_port           = 389
+  protocol          = "tcp"
+  cidr_blocks       = [var.evs_vpc_cidr]
+  security_group_id = data.aws_security_group.ad_connector.id
+  description       = "LDAP to DC in EVS VPC"
+}
 
-# # Kerberos Change Password to EVS VPC
-# resource "aws_security_group_rule" "ad_connector_kerberos_change_pwd_tcp" {
-#   type              = "egress"
-#   from_port         = 464
-#   to_port           = 464
-#   protocol          = "tcp"
-#   cidr_blocks       = [var.evs_vpc_cidr]
-#   security_group_id = aws_security_group.ad_connector.id
-#   description       = "Kerberos Change Password "
-# }
+# LDAP UDP to EVS VPC
+resource "aws_security_group_rule" "ad_connector_ldap_udp" {
+  type              = "egress"
+  from_port         = 389
+  to_port           = 389
+  protocol          = "udp"
+  cidr_blocks       = [var.evs_vpc_cidr]
+  security_group_id = data.aws_security_group.ad_connector.id
+  description       = "LDAP UDP to DC in EVS VPC"
+}
 
-# resource "aws_security_group_rule" "ad_connector_kerberos_change_pwd_udp" {
-#   type              = "egress"
-#   from_port         = 464
-#   to_port           = 464
-#   protocol          = "udp"
-#   cidr_blocks       = [var.evs_vpc_cidr]
-#   security_group_id = aws_security_group.ad_connector.id
-#   description       = "Kerberos Change Password"
-# }
+# SMB to EVS VPC
+resource "aws_security_group_rule" "ad_connector_smb_445_tcp" {
+  type              = "egress"
+  from_port         = 445
+  to_port           = 445
+  protocol          = "tcp"
+  cidr_blocks       = [var.evs_vpc_cidr]
+  security_group_id = data.aws_security_group.ad_connector.id
+  description       = "SMB to DC in EVS VPC"
+}
 
-# # LDAPS to EVS VPC
-# resource "aws_security_group_rule" "ad_connector_ldaps" {
-#   type              = "egress"
-#   from_port         = 636
-#   to_port           = 636
-#   protocol          = "tcp"
-#   cidr_blocks       = [var.evs_vpc_cidr]
-#   security_group_id = aws_security_group.ad_connector.id
-#   description       = "LDAPS to DC in EVS VPC"
-# }
+resource "aws_security_group_rule" "ad_connector_smb_445_udp" {
+  type              = "egress"
+  from_port         = 445
+  to_port           = 445
+  protocol          = "udp"
+  cidr_blocks       = [var.evs_vpc_cidr]
+  security_group_id = data.aws_security_group.ad_connector.id
+  description       = "SMB to DC in EVS VPC"
+}
 
-# # Global Catalog to EVS VPC
-# resource "aws_security_group_rule" "ad_connector_global_catalog" {
-#   type              = "egress"
-#   from_port         = 3268
-#   to_port           = 3269
-#   protocol          = "tcp"
-#   cidr_blocks       = [var.evs_vpc_cidr]
-#   security_group_id = aws_security_group.ad_connector.id
-#   description       = "Global Catalog to DC in EVS VPC"
-# }
+# Kerberos Change Password to EVS VPC
+resource "aws_security_group_rule" "ad_connector_kerberos_change_pwd_tcp" {
+  type              = "egress"
+  from_port         = 464
+  to_port           = 464
+  protocol          = "tcp"
+  cidr_blocks       = [var.evs_vpc_cidr]
+  security_group_id = data.aws_security_group.ad_connector.id
+  description       = "Kerberos Change Password "
+}
 
-# # Dynamic RPC to EVS VPC
-# resource "aws_security_group_rule" "ad_connector_dynamic_rpc" {
-#   type              = "egress"
-#   from_port         = 1024
-#   to_port           = 65535
-#   protocol          = "tcp"
-#   cidr_blocks       = [var.evs_vpc_cidr]
-#   security_group_id = aws_security_group.ad_connector.id
-#   description       = "Dynamic RPC to DC in EVS VPC"
-# }
+resource "aws_security_group_rule" "ad_connector_kerberos_change_pwd_udp" {
+  type              = "egress"
+  from_port         = 464
+  to_port           = 464
+  protocol          = "udp"
+  cidr_blocks       = [var.evs_vpc_cidr]
+  security_group_id = data.aws_security_group.ad_connector.id
+  description       = "Kerberos Change Password"
+}
 
-# # HTTPS outbound for WorkSpaces agent registration and management communication
-# # NOTE: Requires NAT Gateway or type of connection to the internet in VPC2 to route 0.0.0.0/0 traffic from private subnets to internet
-# # TODO: create NAT Gateway in network_infra.tf if not already present or route through Transit Gateway if it provides internet access
-# # trivy:ignore:AVD-AWS-0104
+# LDAPS to EVS VPC
+resource "aws_security_group_rule" "ad_connector_ldaps" {
+  type              = "egress"
+  from_port         = 636
+  to_port           = 636
+  protocol          = "tcp"
+  cidr_blocks       = [var.evs_vpc_cidr]
+  security_group_id = data.aws_security_group.ad_connector.id
+  description       = "LDAPS to DC in EVS VPC"
+}
+
+# Global Catalog to EVS VPC
+resource "aws_security_group_rule" "ad_connector_global_catalog" {
+  type              = "egress"
+  from_port         = 3268
+  to_port           = 3269
+  protocol          = "tcp"
+  cidr_blocks       = [var.evs_vpc_cidr]
+  security_group_id = data.aws_security_group.ad_connector.id
+  description       = "Global Catalog to DC in EVS VPC"
+}
+
+# Dynamic RPC to EVS VPC
+resource "aws_security_group_rule" "ad_connector_dynamic_rpc" {
+  type              = "egress"
+  from_port         = 1024
+  to_port           = 65535
+  protocol          = "tcp"
+  cidr_blocks       = [var.evs_vpc_cidr]
+  security_group_id = data.aws_security_group.ad_connector.id
+  description       = "Dynamic RPC to DC in EVS VPC"
+}
+
+# HTTPS outbound for WorkSpaces agent registration and management communication
+# NOTE: Requires NAT Gateway or type of connection to the internet in VPC2 to route 0.0.0.0/0 traffic from private subnets to internet
+# TODO: create NAT Gateway in network_infra.tf if not already present or route through Transit Gateway if it provides internet access
+# trivy:ignore:AVD-AWS-0104
 # resource "aws_security_group_rule" "ad_connector_https" {
 #   type              = "egress"
 #   from_port         = 443
 #   to_port           = 443
 #   protocol          = "tcp"
 #   cidr_blocks       = ["0.0.0.0/0"]
-#   security_group_id = aws_security_group.ad_connector.id
+#   security_group_id = data.aws_security_group.ad_connector.id
 #   description       = "HTTPS outbound for WorkSpaces management"
 # }
