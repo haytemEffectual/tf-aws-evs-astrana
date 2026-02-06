@@ -38,7 +38,7 @@ resource "time_sleep" "wait_for_ad_connector" {
 # Data source to retrieve AWS-managed security group
 data "aws_security_group" "ad_connector" {
   depends_on = [time_sleep.wait_for_ad_connector]
-  
+
   filter {
     name   = "vpc-id"
     values = [aws_vpc.workspaces.id]
@@ -52,8 +52,8 @@ data "aws_security_group" "ad_connector" {
 
 resource "aws_ec2_tag" "ad_connector_sg_name" {
   resource_id = data.aws_security_group.ad_connector.id
-  key   = "Name"
-  value = "workspaces-ad-connector-sg"
+  key         = "Name"
+  value       = "workspaces-ad-connector-sg"
 }
 
 # Egress rules for AD Connector security group
@@ -224,12 +224,12 @@ resource "aws_security_group_rule" "ad_connector_dynamic_rpc" {
 # NOTE: Requires NAT Gateway or type of connection to the internet in VPC2 to route 0.0.0.0/0 traffic from private subnets to internet
 # TODO: create NAT Gateway in network_infra.tf if not already present or route through Transit Gateway if it provides internet access
 # trivy:ignore:AVD-AWS-0104
-resource "aws_security_group_rule" "ad_connector_https" {
-  type              = "egress"
-  from_port         = 443
-  to_port           = 443
-  protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = data.aws_security_group.ad_connector.id
-  description       = "HTTPS outbound for WorkSpaces management"
-}
+# resource "aws_security_group_rule" "ad_connector_https" {
+#   type              = "egress"
+#   from_port         = 443
+#   to_port           = 443
+#   protocol          = "tcp"
+#   cidr_blocks       = ["0.0.0.0/0"]
+#   security_group_id = data.aws_security_group.ad_connector.id
+#   description       = "HTTPS outbound for WorkSpaces management"
+# }
