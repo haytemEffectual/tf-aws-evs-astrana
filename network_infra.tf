@@ -211,9 +211,9 @@ resource "aws_route" "workspacesvpc_default_route" {
 #####################################################################################
 #### Create DHCP Options Set for workspaces VPC to point to EVS VPC AD DNS IPs
 resource "aws_vpc_dhcp_options" "workspaces_vpc" {
-  domain_name         = var.domain_name # e.g., "corp.example.com"
-  domain_name_servers = var.ad_dns_ips  # AD DNS IPs in EVS VPC
-  ntp_servers         = var.ad_dns_ips  # Optional: Use AD servers for NTP
+  domain_name         = var.domain_name             # e.g., "corp.example.com"
+  domain_name_servers = slice(var.ad_dns_ips, 0, 2) # AD DNS IPs in EVS VPC (first two IPs only from the list)
+  ntp_servers         = slice(var.ad_dns_ips, 0, 2) # Optional: Use AD servers for NTP (first two IPs only from the list)
   tags = {
     Name        = "workspaces-vpc-dhcp-option-set"
     Environment = var.environment
@@ -228,9 +228,9 @@ resource "aws_vpc_dhcp_options_association" "workspaces_vpc" {
 
 #### Create DHCP Options Set for EVS VPC
 resource "aws_vpc_dhcp_options" "evs_vpc" {
-  domain_name         = var.domain_name # Same domain
-  domain_name_servers = var.ad_dns_ips
-  ntp_servers         = var.ad_dns_ips
+  domain_name         = var.domain_name             # Same domain
+  domain_name_servers = slice(var.ad_dns_ips, 0, 2) #  AD DNS IPs in EVS VPC (first two IPs only from the list)
+  ntp_servers         = slice(var.ad_dns_ips, 0, 2) # Optional: Use AD servers for NTP (first two IPs only from the list)
   tags = {
     Name        = "evs-vpc-dhcp-option-set"
     Environment = var.environment

@@ -1,0 +1,17 @@
+  ✅ 1- VPC1 & VPC2: VPC1 for (EVS) and VPC2 for (WorkSpaces)
+  ✅ 2- VPC Peering: between VPC1 (EVS) and VPC2 (WorkSpaces)
+  ✅ 3- Subnets in both VPCs
+  ✅ 4- Route tables
+      a. create route tables and associations for both VPCs
+      b. add peering routes to both VPCs route tables and TGW routes for on-premises access
+  ✅ 5- DHCP Options Set for both VPCs to point to AD DNS IPs
+  ✅ 6- TGW attachments for both VPCs
+  ✅ 7- AD Connector in WorkSpaces VPC
+  ✅ 8- Security Group for AD Connector in WorkSpaces VPC
+  ✅ 9- cllient VPN to access the VPC
+  ❌ 10-  test and validate AD connector functionality with AD/DC 
+  ❌ 11- Security Group for WorkSpaces instances
+  ❌ 12- Security group rules for WorkSpaces (ingress/egress)
+  ❌ 13- WorkSpaces Directory registration with AD Connector
+  ❌ 14- WorkSpaces configuration (self-service permissions, access properties, creation properties)
+  ❌ 15- Individual WorkSpace instances (as needed)
