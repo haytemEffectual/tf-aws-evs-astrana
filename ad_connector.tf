@@ -224,13 +224,13 @@ resource "aws_security_group_rule" "ad_connector_vpc_clients_access" {
   type              = "ingress"
   from_port         = 0
   to_port           = 0
-  protocol          = "-1" 
+  protocol          = "-1"
   cidr_blocks       = [var.workspaces_vpc_cidr]
   security_group_id = data.aws_security_group.ad_connector.id
   description       = "Allow all traffic from WorkSpaces VPC"
 }
 
-# HTTPS outbound for WorkSpaces agent registration and management communication
+# HTTPS outbound for WorkSpaces agent registration and management communication 
 # NOTE: Requires NAT Gateway or type of connection to the internet in VPC2 to route 0.0.0.0/0 traffic from private subnets to internet
 # TODO: create NAT Gateway in network_infra.tf if not already present or route through Transit Gateway if it provides internet access
 # trivy:ignore:AVD-AWS-0104
