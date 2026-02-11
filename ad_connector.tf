@@ -35,6 +35,26 @@ resource "time_sleep" "wait_for_ad_connector" {
   create_duration = "420s" # Wait 7 minutes for AD Connector to be ready
 }
 
+#####################################################################################
+######################### CLOUDWATCH MONITORING FOR AD CONNECTOR ####################
+#####################################################################################
+
+# CloudWatch Log Group for AD Connector
+resource "aws_cloudwatch_log_group" "ad_connector" {
+  name              = "/aws/directoryservice/${aws_directory_service_directory.ad_connector.id}"
+  retention_in_days = 30
+  tags = {
+    Name        = "ad-connector-logs"
+    Environment = var.environment
+  }
+}
+
+# Enable CloudWatch Logs for AD Connector
+resource "aws_directory_service_log_subscription" "ad_connector" {
+  directory_id   = aws_directory_service_directory.ad_connector.id
+  log_group_name = aws_cloudwatch_log_group.ad_connector.name
+}
+
 # Data source to retrieve AWS-managed security group
 data "aws_security_group" "ad_connector" {
   depends_on = [time_sleep.wait_for_ad_connector]
@@ -230,16 +250,3 @@ resource "aws_security_group_rule" "ad_connector_vpc_clients_access" {
   description       = "Allow all traffic from WorkSpaces VPC"
 }
 
-# HTTPS outbound for WorkSpaces agent registration and management communication 
-# NOTE: Requires NAT Gateway or type of connection to the internet in VPC2 to route 0.0.0.0/0 traffic from private subnets to internet
-# TODO: create NAT Gateway in network_infra.tf if not already present or route through Transit Gateway if it provides internet access
-# trivy:ignore:AVD-AWS-0104
-# resource "aws_security_group_rule" "ad_connector_https" {
-#   type              = "egress"
-#   from_port         = 443
-#   to_port           = 443
-#   protocol          = "tcp"
-#   cidr_blocks       = ["0.0.0.0/0"]
-#   security_group_id = data.aws_security_group.ad_connector.id
-#   description       = "HTTPS outbound for WorkSpaces management"
-# }
