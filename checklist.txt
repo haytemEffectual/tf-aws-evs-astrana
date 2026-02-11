@@ -8,10 +8,12 @@
   ✅ 6- TGW attachments for both VPCs
   ✅ 7- AD Connector in WorkSpaces VPC
   ✅ 8- Security Group for AD Connector in WorkSpaces VPC
-  ✅ 9- cllient VPN to access the VPC
-  ❌ 10-  test and validate AD connector functionality with AD/DC 
-  ❌ 11- Security Group for WorkSpaces instances
-  ❌ 12- Security group rules for WorkSpaces (ingress/egress)
-  ❌ 13- WorkSpaces Directory registration with AD Connector
-  ❌ 14- WorkSpaces configuration (self-service permissions, access properties, creation properties)
-  ❌ 15- Individual WorkSpace instances (as needed)
+  ✅ 9- Client VPN or access to VPC locally (CLIENT RESPONSIBILITY - NOT IN SOW - Astrana Health to implement)
+  ✅ 10- observability and cloudwatch configuration for Workspaces VPC 
+  ✅ 11- test and validate AD connector functionality with AD/DC 
+  ❌ 12- Security Group for WorkSpaces instances
+  ❌ 13- Security group rules for WorkSpaces (ingress/egress)
+  ❌ 14- WorkSpaces Directory registration with AD Connector
+  ❌ 15- WorkSpaces configuration (self-service permissions, access properties, creation properties)
+  ❌ 16- Individual WorkSpace instances (as needed)
+  ❌ 17- adding deep monitoring for workspaces and automate the install of cloudwatch agents in workspaces 
