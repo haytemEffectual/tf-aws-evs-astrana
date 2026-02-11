@@ -48,7 +48,7 @@ resource "aws_cloudwatch_metric_alarm" "ad_connector_dns_queries" {
   namespace           = "AWS/DirectoryService"
   period              = 300 # 5 minutes
   statistic           = "Sum"
-  threshold           = 1000 # triggers if EACH of 2 consecutive 5-minute periods has more than 1000 DNS queries
+  threshold           = 10000 # triggers if EACH of 2 consecutive 5-minute periods has more than 1000 DNS queries
   alarm_description   = "AD Connector is experiencing high DNS query volume"
   treat_missing_data  = "notBreaching"
 
