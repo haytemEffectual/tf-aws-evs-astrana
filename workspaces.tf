@@ -27,10 +27,33 @@ resource "aws_security_group_rule" "workspaces_egress_to_ad_connector" {
   from_port                = 0
   to_port                  = 65535
   protocol                 = "tcp"
-  source_security_group_id = aws_security_group.ad_connector.id
+  source_security_group_id = data.aws_security_group.ad_connector.id
   security_group_id        = aws_security_group.workspaces.id
   description              = "To AD Connector"
 }
+
+# TODO: uncomment this after testing workspaces registrations throug AD to allow egress traffic to other destinations as needed
+# # Egress: allow traffic to EVS VPC (for domain controllers and other resources)
+# resource "aws_security_group_rule" "workspaces_egress_to_evs_vpc" {
+#   type              = "egress"
+#   from_port         = 0
+#   to_port           = 65535
+#   protocol          = "-1"  # All protocols
+#   cidr_blocks       = [var.evs_vpc_cidr]
+#   security_group_id = aws_security_group.workspaces.id
+#   description       = "To EVS VPC resources"
+# }
+
+# # Egress: allow all internet access (if needed)
+# resource "aws_security_group_rule" "workspaces_egress_internet" {
+#   type              = "egress"
+#   from_port         = 0
+#   to_port           = 65535
+#   protocol          = "-1"
+#   cidr_blocks       = ["0.0.0.0/0"]
+#   security_group_id = aws_security_group.workspaces.id
+#   description       = "All internet access"
+# }
 
 # Egress: allow HTTPS outbound
 # trivy:ignore:AVD-AWS-0104

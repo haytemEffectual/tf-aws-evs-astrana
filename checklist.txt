@@ -16,4 +16,5 @@
   ❌ 14- WorkSpaces Directory registration with AD Connector
   ❌ 15- WorkSpaces configuration (self-service permissions, access properties, creation properties)
   ❌ 16- Individual WorkSpace instances (as needed)
-  ❌ 17- adding deep monitoring for workspaces and automate the install of cloudwatch agents in workspaces 
+  ❌ 17- add egress security group rules to other traffic as needed after testing Workspaces with AD
+  ❌ 18- adding deep monitoring for workspaces and automate the install of cloudwatch agents in workspaces 
