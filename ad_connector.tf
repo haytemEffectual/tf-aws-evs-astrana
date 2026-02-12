@@ -23,10 +23,13 @@ resource "aws_directory_service_directory" "ad_connector" {
     customer_dns_ips  = var.ad_dns_ips
     customer_username = jsondecode(data.aws_secretsmanager_secret_version.ad_connector_sa.secret_string)["ad_connector_username"]
   }
-  tags = {
-    Name        = "WorkSpaces-AD-Connector"
-    Environment = var.environment
-  }
+  tags = merge(
+    {
+      Name        = "WorkSpaces-AD-Connector"
+      Environment = var.environment
+    },
+    var.map_tag
+  )
 }
 
 # Wait for AD Connector to be activated

@@ -140,10 +140,13 @@ resource "aws_workspaces_directory" "main" {
     enable_maintenance_mode             = true
     user_enabled_as_local_administrator = false
   }
-  tags = {
-    Name        = "WorkSpaces-Directory"
-    Environment = "Production"
-  }
+  tags = merge(
+    {
+      Name        = "WorkSpaces-Directory"
+      Environment = "Production"
+    },
+    var.map_tag
+  )
 }
 
 
