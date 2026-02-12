@@ -158,7 +158,7 @@ resource "aws_workspaces_directory" "main" {
 
 #   # Bundle and compute configuration
 #   bundle_id = "wsb-bh8rsxt14" # Standard Windows bundle
-  
+
 #   # Directory configuration
 #   directory_id = aws_directory_service_directory.ad_connector.id
 
