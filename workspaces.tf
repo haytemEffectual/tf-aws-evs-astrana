@@ -151,21 +151,21 @@ resource "aws_workspaces_directory" "main" {
 
 
 # Example WorkSpace
-# resource "aws_workspaces_workspace" "example" {
-#   depends_on   = [aws_workspaces_directory.main]
-#   directory_id = aws_directory_service_directory.ad_connector.id
-#   bundle_id    = "wsb-bh8rsxt14" # Standard bundle ID
-#   user_name    = "john.doe"
-#   workspace_properties {
-#     compute_type_name                         = "STANDARD"
-#     user_volume_size_gib                      = 50
-#     root_volume_size_gib                      = 80
-#     running_mode                              = "AUTO_STOP"
-#     running_mode_auto_stop_timeout_in_minutes = 60
-#   }
-#   tags = {
-#     Name        = "john.doe-workspace"
-#     Environment = "Production"
-#   }
-# }
+resource "aws_workspaces_workspace" "example" {
+  depends_on   = [aws_workspaces_directory.main]
+  directory_id = aws_directory_service_directory.ad_connector.id
+  bundle_id    = "wsb-bh8rsxt14" # Standard bundle ID
+  user_name    = "haytem.alsharif"
+  workspace_properties {
+    compute_type_name                         = "STANDARD"
+    user_volume_size_gib                      = 50
+    root_volume_size_gib                      = 80
+    running_mode                              = "AUTO_STOP"
+    running_mode_auto_stop_timeout_in_minutes = 15
+  }
+  tags = {
+    Name        = "haytem.alsharif-workspace"
+    Environment = "Production"
+  }
+}
 
