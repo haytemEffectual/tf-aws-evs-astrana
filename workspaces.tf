@@ -192,10 +192,13 @@ resource "aws_workspaces_directory" "main" {
 
 # ################### Example Personal WorkSpace
 resource "aws_workspaces_workspace" "example" {
-  depends_on   = [aws_workspaces_directory.main]
-  directory_id = aws_directory_service_directory.ad_connector.id
-  bundle_id    = "wsb-bh8rsxt14" # Standard bundle ID
-  user_name    = "haytem.alsharif"
+  depends_on            = [aws_workspaces_directory.main]
+  directory_id          = aws_directory_service_directory.ad_connector.id
+  bundle_id             = "wsb-bh8rsxt14" # Standard bundle ID
+  user_name             = "haytem.alsharif"
+  root_volume_encryption_enabled = true
+  user_volume_encryption_enabled = true
+  volume_encryption_key = "alias/aws/workspaces" # Uses AWS managed key for WorkSpaces
   workspace_properties {
     compute_type_name                         = "STANDARD"
     user_volume_size_gib                      = 50
