@@ -1,3 +1,38 @@
+################### IAM Role for WorkSpaces Service
+# AWS WorkSpaces requires this specific role name to exist in the account
+resource "aws_iam_role" "workspaces_default" {
+  name = "workspaces_DefaultRole"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "workspaces.amazonaws.com"
+        }
+      }
+    ]
+  })
+
+  tags = {
+    Name        = "WorkSpaces Default Service Role"
+    Environment = var.environment
+  }
+}
+
+# Attach AWS managed policy for WorkSpaces self-service access
+resource "aws_iam_role_policy_attachment" "workspaces_default_service_access" {
+  role       = aws_iam_role.workspaces_default.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonWorkSpacesServiceAccess"
+}
+
+# Attach AWS managed policy for WorkSpaces self-service permissions
+resource "aws_iam_role_policy_attachment" "workspaces_default_self_service_access" {
+  role       = aws_iam_role.workspaces_default.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonWorkSpacesSelfServiceAccess"
+}
 
 ################### Security Group for WorkSpaces
 resource "aws_security_group" "workspaces" {
@@ -70,7 +105,12 @@ resource "aws_security_group_rule" "workspaces_egress_https" {
 
 #######################  Register Directory with WorkSpaces
 resource "aws_workspaces_directory" "main" {
-  depends_on   = [time_sleep.wait_for_ad_connector]
+  depends_on = [
+    time_sleep.wait_for_ad_connector,
+    aws_iam_role.workspaces_default,
+    aws_iam_role_policy_attachment.workspaces_default_service_access,
+    aws_iam_role_policy_attachment.workspaces_default_self_service_access
+  ]
   directory_id = aws_directory_service_directory.ad_connector.id
   subnet_ids   = aws_subnet.workspaces_vpc_subnets[*].id
   #TODO: need to review with Astrana team about actual settings for selfe service permissions on what users can do
