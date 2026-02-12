@@ -147,10 +147,47 @@ resource "aws_workspaces_directory" "main" {
 }
 
 
+# ################### WorkSpaces Pool for Shared Access
+# # Non-persistent WorkSpaces that can be used by multiple users
+# resource "aws_workspaces_pool" "workspaces_pool" {
+#   pool_name   = "shared-workspaces-pool"
+#   description = "Shared WorkSpaces pool for temporary access and jumpbox use cases"
+
+#   # Bundle and compute configuration
+#   bundle_id = "wsb-bh8rsxt14" # Standard Windows bundle
+  
+#   # Directory configuration
+#   directory_id = aws_directory_service_directory.ad_connector.id
+
+#   # Capacity settings - number of WorkSpaces in the pool
+#   capacity {
+#     desired_user_sessions = 5 # Adjust based on concurrent user needs
+#   }
+
+#   # Application settings
+#   application_settings {
+#     status           = "DISABLED" # Enable if you need application persistence
+#     settings_group   = "" # Optional: S3 bucket for app settings
+#   }
+
+#   # Timeout settings
+#   timeout_settings {
+#     disconnect_timeout_in_seconds = 900     # 15 minutes idle before disconnect
+#     idle_disconnect_timeout_in_seconds = 600 # 10 minutes idle before marking idle
+#     max_user_duration_in_seconds = 28800   # 8 hours max session
+#   }
+
+#   tags = {
+#     Name        = "Shared WorkSpaces Pool"
+#     Environment = var.environment
+#     Purpose     = "Shared access for jumpbox and temporary workstations"
+#   }
+
+#   depends_on = [aws_workspaces_directory.main]
+# }
 
 
-
-# Example WorkSpace
+# ################### Example Personal WorkSpace
 resource "aws_workspaces_workspace" "example" {
   depends_on   = [aws_workspaces_directory.main]
   directory_id = aws_directory_service_directory.ad_connector.id
@@ -161,7 +198,7 @@ resource "aws_workspaces_workspace" "example" {
     user_volume_size_gib                      = 50
     root_volume_size_gib                      = 80
     running_mode                              = "AUTO_STOP"
-    running_mode_auto_stop_timeout_in_minutes = 15
+    running_mode_auto_stop_timeout_in_minutes = 60 # Minimum: 60 mins, must be multiple of 60
   }
   tags = {
     Name        = "haytem.alsharif-workspace"
