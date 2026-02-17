@@ -1,4 +1,6 @@
-################### IAM Role for WorkSpaces Service
+#####################################################################################
+################       IAM ROLE FOR WORKSPACES SERVICE        ######################
+#####################################################################################
 # AWS WorkSpaces requires this specific role name to exist in the account
 resource "aws_iam_role" "workspaces_default" {
   name = "workspaces_DefaultRole"
@@ -34,7 +36,9 @@ resource "aws_iam_role_policy_attachment" "workspaces_default_self_service_acces
   policy_arn = "arn:aws:iam::aws:policy/AmazonWorkSpacesSelfServiceAccess"
 }
 
-################### Security Group for WorkSpaces
+#####################################################################################
+################        SECURITY GROUP FOR WORKSPACES         ######################
+#####################################################################################
 resource "aws_security_group" "workspaces" {
   name_prefix = "workspaces-"
   description = "Security group for WorkSpaces instances"
@@ -102,8 +106,9 @@ resource "aws_security_group_rule" "workspaces_egress_https" {
   description       = "HTTPS outbound"
 }
 
-
-#######################  Register Directory with WorkSpaces
+#####################################################################################
+################     REGISTER DIRECTORY WITH WORKSPACES       ######################
+#####################################################################################
 resource "aws_workspaces_directory" "main" {
   depends_on = [
     time_sleep.wait_for_ad_connector,
@@ -149,8 +154,9 @@ resource "aws_workspaces_directory" "main" {
   )
 }
 
-
-# ################### WorkSpaces Pool for Shared Access
+#####################################################################################
+################      WORKSPACES POOL FOR SHARED ACCESS       ######################
+#####################################################################################
 # # Non-persistent WorkSpaces that can be used by multiple users
 # resource "aws_workspaces_pool" "workspaces_pool" {
 #   pool_name   = "shared-workspaces-pool"
@@ -192,8 +198,9 @@ resource "aws_workspaces_directory" "main" {
 #   depends_on = [aws_workspaces_directory.main]
 # }
 
-
-# ################### Example Personal WorkSpace
+#####################################################################################
+################         EXAMPLE PERSONAL WORKSPACE           ######################
+#####################################################################################
 resource "aws_workspaces_workspace" "example" {
   depends_on                     = [aws_workspaces_directory.main]
   directory_id                   = aws_directory_service_directory.ad_connector.id

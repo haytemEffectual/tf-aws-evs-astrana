@@ -9,7 +9,10 @@ data "aws_secretsmanager_secret_version" "ad_connector_sa" {
   secret_id = var.ad_connector_creds_secret_arn
 }
 
-###### AD Connector
+#####################################################################################
+################          CONFIGURING AD CONNECTOR             ######################
+#####################################################################################
+
 resource "aws_directory_service_directory" "ad_connector" {
   name        = var.domain_name
   short_name  = var.domain_short_name
@@ -38,6 +41,9 @@ resource "time_sleep" "wait_for_ad_connector" {
   create_duration = "420s" # Wait 7 minutes for AD Connector to be ready
 }
 
+#####################################################################################
+################         SECURITY GROUP FOR AD CONNECTOR       ######################
+#####################################################################################
 resource "aws_ec2_tag" "ad_connector_sg_name" {
   depends_on  = [time_sleep.wait_for_ad_connector]
   resource_id = aws_directory_service_directory.ad_connector.security_group_id
