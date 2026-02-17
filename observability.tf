@@ -33,10 +33,13 @@ resource "aws_cloudwatch_metric_alarm" "ad_connector_dns_queries" {
 resource "aws_cloudwatch_log_group" "workspaces_vpc_flow_logs" {
   name              = "/aws/vpc/flowlogs/workspaces-vpc"
   retention_in_days = 30
-  tags = {
-    Name        = "WorkSpaces VPC Flow Logs"
-    Environment = var.environment
-  }
+  tags = merge(
+    {
+      Name        = "WorkSpaces VPC Flow Logs"
+      Environment = var.environment
+    },
+    var.map_tag
+  )
 }
 
 # IAM Role for VPC Flow Logs

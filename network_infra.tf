@@ -27,10 +27,13 @@ resource "aws_vpc" "evs" {
   enable_dns_hostnames = true
   enable_dns_support   = true
 
-  tags = {
-    Application = "evs"
-    Name        = "evs-vpc"
-  }
+  tags = merge(
+    {
+      Application = "evs"
+      Name        = "evs-vpc"
+    },
+    var.map_tag
+  )
 }
 
 resource "aws_vpc" "workspaces" {
@@ -38,10 +41,13 @@ resource "aws_vpc" "workspaces" {
   enable_dns_hostnames = true
   enable_dns_support   = true
 
-  tags = {
-    Application = "workspaces"
-    Name        = "workspaces-vpc"
-  }
+  tags = merge(
+    {
+      Application = "workspaces"
+      Name        = "workspaces-vpc"
+    },
+    var.map_tag
+  )
 }
 
 #  Data sources to read the VPC IDs -- those datassources were added to read the pre-existed VPCs in prod env in case they are not created by this code.
@@ -260,10 +266,13 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "evs-vpc" {
   subnet_ids         = aws_subnet.evs_vpc_subnets[*].id
   transit_gateway_id = var.transit_gateway_id
   vpc_id             = data.aws_vpc.evs.id
-  tags = {
-    Name        = "evs-vpc-tgw-Attachment"
-    Environment = var.environment
-  }
+  tags = merge(
+    {
+      Name        = "evs-vpc-tgw-Attachment"
+      Environment = var.environment
+    },
+    var.map_tag
+  )
 }
 
 # Handle state transition from count-based to direct resource
@@ -276,10 +285,13 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "workspaces-vpc" {
   subnet_ids         = aws_subnet.workspaces_vpc_subnets[*].id
   transit_gateway_id = var.transit_gateway_id
   vpc_id             = data.aws_vpc.workspaces.id
-  tags = {
-    Name        = "workspaces-vpc-tgw-Attachment"
-    Environment = var.environment
-  }
+  tags = merge(
+    {
+      Name        = "workspaces-vpc-tgw-Attachment"
+      Environment = var.environment
+    },
+    var.map_tag
+  )
 }
 
 
