@@ -27,10 +27,13 @@ resource "aws_vpc" "evs" {
   enable_dns_hostnames = true
   enable_dns_support   = true
 
-  tags = {
-    Application = "evs"
-    Name        = "evs-vpc"
-  }
+  tags = merge(
+    {
+      Application = "evs"
+      Name        = "evs-vpc"
+    },
+    var.map_tag
+  )
 }
 
 resource "aws_vpc" "workspaces" {
@@ -38,10 +41,13 @@ resource "aws_vpc" "workspaces" {
   enable_dns_hostnames = true
   enable_dns_support   = true
 
-  tags = {
-    Application = "workspaces"
-    Name        = "workspaces-vpc"
-  }
+  tags = merge(
+    {
+      Application = "workspaces"
+      Name        = "workspaces-vpc"
+    },
+    var.map_tag
+  )
 }
 
 #  Data sources to read the VPC IDs -- those datassources were added to read the pre-existed VPCs in prod env in case they are not created by this code.

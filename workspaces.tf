@@ -62,7 +62,7 @@ resource "aws_security_group_rule" "workspaces_egress_to_ad_connector" {
   from_port                = 0
   to_port                  = 65535
   protocol                 = "tcp"
-  source_security_group_id = data.aws_security_group.ad_connector.id
+  source_security_group_id = aws_directory_service_directory.ad_connector.security_group_id
   security_group_id        = aws_security_group.workspaces.id
   description              = "To AD Connector"
 }
@@ -180,11 +180,14 @@ resource "aws_workspaces_directory" "main" {
 #     max_user_duration_in_seconds = 28800   # 8 hours max session
 #   }
 
-#   tags = {
-#     Name        = "Shared WorkSpaces Pool"
-#     Environment = var.environment
-#     Purpose     = "Shared access for jumpbox and temporary workstations"
-#   }
+#   tags = merge(
+#     {
+#       Name        = "Shared WorkSpaces Pool"
+#       Environment = var.environment
+#       Purpose     = "Shared access for jumpbox and temporary workstations"
+#     },
+#     var.map_tag
+#   )
 
 #   depends_on = [aws_workspaces_directory.main]
 # }
@@ -206,9 +209,12 @@ resource "aws_workspaces_workspace" "example" {
     running_mode                              = "AUTO_STOP"
     running_mode_auto_stop_timeout_in_minutes = 60 # Minimum: 60 mins, must be multiple of 60
   }
-  tags = {
-    Name        = "haytem.alsharif-workspace"
-    Environment = "Production"
-  }
+  tags = merge(
+    {
+      Name        = "haytem.alsharif-workspace"
+      Environment = "Production"
+    },
+    var.map_tag
+  )
 }
 
