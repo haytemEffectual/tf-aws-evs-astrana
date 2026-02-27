@@ -209,7 +209,7 @@ resource "aws_workspaces_workspace" "example" {
   root_volume_encryption_enabled = true
   user_volume_encryption_enabled = true
   volume_encryption_key          = "alias/aws/workspaces" # Uses AWS managed key for WorkSpaces
-  workspace_properties {
+  workspace_properties {                                  # https://docs.aws.amazon.com/workspaces/latest/api/API_WorkspaceProperties.html
     compute_type_name                         = "STANDARD"
     user_volume_size_gib                      = 50
     root_volume_size_gib                      = 80
