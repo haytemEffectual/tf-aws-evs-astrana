@@ -10,3 +10,4 @@ domain_short_name             = "alliedipa"
 default_ou                    = "OU=Workspaces,DC=alliedipa,DC=int"
 ad_dns_ips                    = ["10.210.20.10", "10.1.7.12", "10.1.7.13"] # 
 ad_connector_creds_secret_arn = "arn:aws:secretsmanager:us-west-2:747025127203:secret:ad_connector_sa-j5Ducj"
+map_tag                       = { "map-migrated" : "migSHUGRNMVMC" } # this is used by MPE id identified by MAP 2.0 tagging program  

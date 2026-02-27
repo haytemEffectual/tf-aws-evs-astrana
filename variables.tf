@@ -54,6 +54,12 @@ variable "ad_connector_creds_secret_arn" {
   type        = string
 }
 
+variable "map_tag" {
+  description = "Map of tags to apply to all resources"
+  type        = map(string)
+  default     = {}
+}
+
 
 
 

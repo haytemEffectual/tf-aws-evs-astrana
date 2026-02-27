@@ -1,4 +1,6 @@
-################### IAM Role for WorkSpaces Service
+#####################################################################################
+################       IAM ROLE FOR WORKSPACES SERVICE        ######################
+#####################################################################################
 # AWS WorkSpaces requires this specific role name to exist in the account
 resource "aws_iam_role" "workspaces_default" {
   name = "workspaces_DefaultRole"
@@ -34,7 +36,9 @@ resource "aws_iam_role_policy_attachment" "workspaces_default_self_service_acces
   policy_arn = "arn:aws:iam::aws:policy/AmazonWorkSpacesSelfServiceAccess"
 }
 
-################### Security Group for WorkSpaces
+#####################################################################################
+################        SECURITY GROUP FOR WORKSPACES         ######################
+#####################################################################################
 resource "aws_security_group" "workspaces" {
   name_prefix = "workspaces-"
   description = "Security group for WorkSpaces instances"
@@ -62,7 +66,7 @@ resource "aws_security_group_rule" "workspaces_egress_to_ad_connector" {
   from_port                = 0
   to_port                  = 65535
   protocol                 = "tcp"
-  source_security_group_id = data.aws_security_group.ad_connector.id
+  source_security_group_id = aws_directory_service_directory.ad_connector.security_group_id
   security_group_id        = aws_security_group.workspaces.id
   description              = "To AD Connector"
 }
@@ -102,8 +106,9 @@ resource "aws_security_group_rule" "workspaces_egress_https" {
   description       = "HTTPS outbound"
 }
 
-
-#######################  Register Directory with WorkSpaces
+#####################################################################################
+################     REGISTER DIRECTORY WITH WORKSPACES       ######################
+#####################################################################################
 resource "aws_workspaces_directory" "main" {
   depends_on = [
     time_sleep.wait_for_ad_connector,
@@ -140,32 +145,83 @@ resource "aws_workspaces_directory" "main" {
     enable_maintenance_mode             = true
     user_enabled_as_local_administrator = false
   }
-  tags = {
-    Name        = "WorkSpaces-Directory"
-    Environment = "Production"
-  }
+  tags = merge(
+    {
+      Name        = "WorkSpaces-Directory"
+      Environment = "Production"
+    },
+    var.map_tag
+  )
 }
 
+#####################################################################################
+################      WORKSPACES POOL FOR SHARED ACCESS       ######################
+#####################################################################################
+# # Non-persistent WorkSpaces that can be used by multiple users
+# resource "aws_workspaces_pool" "workspaces_pool" {
+#   pool_name   = "shared-workspaces-pool"
+#   description = "Shared WorkSpaces pool for temporary access and jumpbox use cases"
 
+#   # Bundle and compute configuration
+#   bundle_id = "wsb-bh8rsxt14" # Standard Windows bundle
 
-
-
-# Example WorkSpace
-# resource "aws_workspaces_workspace" "example" {
-#   depends_on   = [aws_workspaces_directory.main]
+#   # Directory configuration
 #   directory_id = aws_directory_service_directory.ad_connector.id
-#   bundle_id    = "wsb-bh8rsxt14" # Standard bundle ID
-#   user_name    = "john.doe"
-#   workspace_properties {
-#     compute_type_name                         = "STANDARD"
-#     user_volume_size_gib                      = 50
-#     root_volume_size_gib                      = 80
-#     running_mode                              = "AUTO_STOP"
-#     running_mode_auto_stop_timeout_in_minutes = 60
+
+#   # Capacity settings - number of WorkSpaces in the pool
+#   capacity {
+#     desired_user_sessions = 5 # Adjust based on concurrent user needs
 #   }
-#   tags = {
-#     Name        = "john.doe-workspace"
-#     Environment = "Production"
+
+#   # Application settings
+#   application_settings {
+#     status           = "DISABLED" # Enable if you need application persistence
+#     settings_group   = "" # Optional: S3 bucket for app settings
 #   }
+
+#   # Timeout settings
+#   timeout_settings {
+#     disconnect_timeout_in_seconds = 900     # 15 minutes idle before disconnect
+#     idle_disconnect_timeout_in_seconds = 600 # 10 minutes idle before marking idle
+#     max_user_duration_in_seconds = 28800   # 8 hours max session
+#   }
+
+#   tags = merge(
+#     {
+#       Name        = "Shared WorkSpaces Pool"
+#       Environment = var.environment
+#       Purpose     = "Shared access for jumpbox and temporary workstations"
+#     },
+#     var.map_tag
+#   )
+
+#   depends_on = [aws_workspaces_directory.main]
 # }
+
+#####################################################################################
+################         EXAMPLE PERSONAL WORKSPACE           ######################
+#####################################################################################
+resource "aws_workspaces_workspace" "example" {
+  depends_on                     = [aws_workspaces_directory.main]
+  directory_id                   = aws_directory_service_directory.ad_connector.id
+  bundle_id                      = "wsb-bh8rsxt14" # Standard bundle ID
+  user_name                      = "haytem.alsharif"
+  root_volume_encryption_enabled = true
+  user_volume_encryption_enabled = true
+  volume_encryption_key          = "alias/aws/workspaces" # Uses AWS managed key for WorkSpaces
+  workspace_properties {                                  # https://docs.aws.amazon.com/workspaces/latest/api/API_WorkspaceProperties.html
+    compute_type_name                         = "STANDARD"
+    user_volume_size_gib                      = 50
+    root_volume_size_gib                      = 80
+    running_mode                              = "AUTO_STOP"
+    running_mode_auto_stop_timeout_in_minutes = 60 # Minimum: 60 mins, must be multiple of 60
+  }
+  tags = merge(
+    {
+      Name        = "haytem.alsharif-workspace"
+      Environment = "Production"
+    },
+    var.map_tag
+  )
+}
 
