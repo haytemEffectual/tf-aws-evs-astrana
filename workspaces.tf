@@ -101,8 +101,8 @@ resource "aws_security_group_rule" "workspaces_egress_to_ad_connector" {
 
 
 # Egress: allow HTTPS outbound
-# trivy:ignore:AVD-AWS-0104
 ###### Egress rules required for WorkSpaces operation ######
+# trivy:ignore:AVD-AWS-0104
 resource "aws_security_group_rule" "workspaces_egress_https" {
   type              = "egress"
   from_port         = 443
@@ -113,8 +113,8 @@ resource "aws_security_group_rule" "workspaces_egress_https" {
   description       = "HTTPS outbound"
 }
 
-# trivy:ignore:AVD-AWS-0104
 # Egress: allow HTTP outbound
+# trivy:ignore:AVD-AWS-0104
 resource "aws_security_group_rule" "workspaces_egress_http" {
   type              = "egress"
   from_port         = 80
@@ -125,8 +125,8 @@ resource "aws_security_group_rule" "workspaces_egress_http" {
   description       = "HTTP outbound"
 }
 
-# trivy:ignore:AVD-AWS-0104
 # Egress: allow PCoIP streaming UDP 4195
+# trivy:ignore:AVD-AWS-0104
 resource "aws_security_group_rule" "workspaces_egress_udp_4195" {
   type              = "egress"
   from_port         = 4195
@@ -137,8 +137,8 @@ resource "aws_security_group_rule" "workspaces_egress_udp_4195" {
   description       = "PCoIP streaming UDP"
 }
 
-# trivy:ignore:AVD-AWS-0104
 # Egress: allow PCoIP UDP 4172
+# trivy:ignore:AVD-AWS-0104
 resource "aws_security_group_rule" "workspaces_egress_udp_4172" {
   type              = "egress"
   from_port         = 4172
@@ -149,8 +149,8 @@ resource "aws_security_group_rule" "workspaces_egress_udp_4172" {
   description       = "PCoIP UDP"
 }
 
-# trivy:ignore:AVD-AWS-0104
 # Egress: allow DNS lookups
+# trivy:ignore:AVD-AWS-0104
 resource "aws_security_group_rule" "workspaces_egress_dns_udp" {
   type              = "egress"
   from_port         = 53
@@ -161,8 +161,9 @@ resource "aws_security_group_rule" "workspaces_egress_dns_udp" {
   description       = "DNS outbound"
 }
 
-# trivy:ignore:AVD-AWS-0104
+
 # Egress: allow HTTP to instance metadata (NAT path)
+# trivy:ignore:AVD-AWS-0104
 resource "aws_security_group_rule" "workspaces_egress_metadata_http" {
   type              = "egress"
   from_port         = 80
