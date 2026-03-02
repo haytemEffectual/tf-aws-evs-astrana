@@ -184,7 +184,7 @@ resource "aws_route" "workspacesvpc_to_evsvpc" {
 # #### Add TGW routes on evs vpc for on-premises access
 resource "aws_route" "evsvpc_default_route" {
   route_table_id         = aws_route_table.evs_vpc_private_rt.id
-  destination_cidr_block = "10.0.0.0/8"
+  destination_cidr_block = "0.0.0.0/0"
   transit_gateway_id     = var.transit_gateway_id
   depends_on = [
     aws_ec2_transit_gateway_vpc_attachment.evs-vpc
@@ -204,7 +204,7 @@ resource "aws_route" "evsvpc_default_route" {
 #### Add TGW routes on workspaces vpc for on-premises access
 resource "aws_route" "workspacesvpc_default_route" {
   route_table_id         = aws_route_table.workspaces_vpc_private_rt.id
-  destination_cidr_block = "10.0.0.0/8"
+  destination_cidr_block = "0.0.0.0/0"
   transit_gateway_id     = var.transit_gateway_id
   depends_on = [
     aws_ec2_transit_gateway_vpc_attachment.workspaces-vpc
