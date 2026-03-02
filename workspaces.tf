@@ -96,6 +96,11 @@ resource "aws_security_group_rule" "workspaces_egress_to_ad_connector" {
 
 # Egress: allow HTTPS outbound
 # trivy:ignore:AVD-AWS-0104
+
+
+
+
+###### Egress rules required for WorkSpaces operation ######
 resource "aws_security_group_rule" "workspaces_egress_https" {
   type              = "egress"
   from_port         = 443
@@ -105,6 +110,63 @@ resource "aws_security_group_rule" "workspaces_egress_https" {
   security_group_id = aws_security_group.workspaces.id
   description       = "HTTPS outbound"
 }
+
+# Egress: allow HTTP outbound
+resource "aws_security_group_rule" "workspaces_egress_http" {
+  type              = "egress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.workspaces.id
+  description       = "HTTP outbound"
+}
+
+# Egress: allow PCoIP streaming UDP 4195
+resource "aws_security_group_rule" "workspaces_egress_udp_4195" {
+  type              = "egress"
+  from_port         = 4195
+  to_port           = 4195
+  protocol          = "udp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.workspaces.id
+  description       = "PCoIP streaming UDP"
+}
+
+# Egress: allow PCoIP UDP 4172
+resource "aws_security_group_rule" "workspaces_egress_udp_4172" {
+  type              = "egress"
+  from_port         = 4172
+  to_port           = 4172
+  protocol          = "udp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.workspaces.id
+  description       = "PCoIP UDP"
+}
+
+# Egress: allow DNS lookups
+resource "aws_security_group_rule" "workspaces_egress_dns_udp" {
+  type              = "egress"
+  from_port         = 53
+  to_port           = 53
+  protocol          = "udp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.workspaces.id
+  description       = "DNS outbound"
+}
+
+# Egress: allow HTTP to instance metadata (NAT path)
+resource "aws_security_group_rule" "workspaces_egress_metadata_http" {
+  type              = "egress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["169.254.169.254/32"]
+  security_group_id = aws_security_group.workspaces.id
+  description       = "HTTP to instance metadata"
+}
+
+
 
 #####################################################################################
 ################     REGISTER DIRECTORY WITH WORKSPACES       ######################
@@ -204,8 +266,8 @@ resource "aws_workspaces_directory" "main" {
 resource "aws_workspaces_workspace" "example" {
   depends_on                     = [aws_workspaces_directory.main]
   directory_id                   = aws_directory_service_directory.ad_connector.id
-  bundle_id                      = "wsb-bh8rsxt14" # Standard bundle ID
-  user_name                      = "haytem.alsharif"
+  bundle_id                      = "wsb-362t3gdrt" # Standard bundle ID
+  user_name                      = "HAlsharif"
   root_volume_encryption_enabled = true
   user_volume_encryption_enabled = true
   volume_encryption_key          = "alias/aws/workspaces" # Uses AWS managed key for WorkSpaces
