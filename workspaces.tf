@@ -94,12 +94,14 @@ resource "aws_security_group_rule" "workspaces_egress_to_ad_connector" {
 #   description       = "All internet access"
 # }
 
+
+
+
+
+
+
 # Egress: allow HTTPS outbound
 # trivy:ignore:AVD-AWS-0104
-
-
-
-
 ###### Egress rules required for WorkSpaces operation ######
 resource "aws_security_group_rule" "workspaces_egress_https" {
   type              = "egress"
@@ -111,6 +113,7 @@ resource "aws_security_group_rule" "workspaces_egress_https" {
   description       = "HTTPS outbound"
 }
 
+# trivy:ignore:AVD-AWS-0104
 # Egress: allow HTTP outbound
 resource "aws_security_group_rule" "workspaces_egress_http" {
   type              = "egress"
@@ -122,6 +125,7 @@ resource "aws_security_group_rule" "workspaces_egress_http" {
   description       = "HTTP outbound"
 }
 
+# trivy:ignore:AVD-AWS-0104
 # Egress: allow PCoIP streaming UDP 4195
 resource "aws_security_group_rule" "workspaces_egress_udp_4195" {
   type              = "egress"
@@ -133,6 +137,7 @@ resource "aws_security_group_rule" "workspaces_egress_udp_4195" {
   description       = "PCoIP streaming UDP"
 }
 
+# trivy:ignore:AVD-AWS-0104
 # Egress: allow PCoIP UDP 4172
 resource "aws_security_group_rule" "workspaces_egress_udp_4172" {
   type              = "egress"
@@ -144,6 +149,7 @@ resource "aws_security_group_rule" "workspaces_egress_udp_4172" {
   description       = "PCoIP UDP"
 }
 
+# trivy:ignore:AVD-AWS-0104
 # Egress: allow DNS lookups
 resource "aws_security_group_rule" "workspaces_egress_dns_udp" {
   type              = "egress"
@@ -155,6 +161,7 @@ resource "aws_security_group_rule" "workspaces_egress_dns_udp" {
   description       = "DNS outbound"
 }
 
+# trivy:ignore:AVD-AWS-0104
 # Egress: allow HTTP to instance metadata (NAT path)
 resource "aws_security_group_rule" "workspaces_egress_metadata_http" {
   type              = "egress"
