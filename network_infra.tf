@@ -211,6 +211,16 @@ resource "aws_route" "workspacesvpc_default_internal_route" {
   ]
 }
 
+########   routing Workspaces to the internet   #############
+resource "aws_route" "workspaces_pvt_default_internet" {
+  route_table_id         = aws_route_table.workspaces_vpc_private_rt.id
+  destination_cidr_block = "0.0.0.0/0"
+  transit_gateway_id     = var.transit_gateway_id
+  depends_on = [
+    aws_ec2_transit_gateway_vpc_attachment.workspaces-vpc
+  ]
+}
+
 #TODO: uncomment the folloing section after Asstrana team creates AD and provides the DNS IPs
 #####################################################################################
 ###################### CONFIGURING DHCP OPTIONS ON BOTH VPCs  #######################
