@@ -60,6 +60,17 @@ variable "map_tag" {
   default     = {}
 }
 
+variable "ws_clients_usernames" {
+  description = "List of usernames for pearsonal WorkSpaces clients"
+  type        = list(string)
+}
+
+variable "enable_personal_workspaces" {
+  description = "Whether to create personal WorkSpaces instances"
+  type        = bool
+  default     = false
+}
+
 
 
 
