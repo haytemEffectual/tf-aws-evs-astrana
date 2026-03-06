@@ -109,7 +109,8 @@ resource "aws_subnet" "evs_vpc_subnets" {
   cidr_block        = cidrsubnet(var.evs_vpc_cidr, 7, count.index)
   availability_zone = data.aws_availability_zones.available.names[count.index % length(data.aws_availability_zones.available.names)]
   tags = {
-    Name = "usw2a-evs-service-access-subnet"
+    Name        = "usw2a-evs-service-access-subnet"
+    application = "evs"
   }
 }
 resource "aws_subnet" "workspaces_vpc_subnets" {
@@ -118,7 +119,8 @@ resource "aws_subnet" "workspaces_vpc_subnets" {
   cidr_block        = cidrsubnet(var.workspaces_vpc_cidr, 4, count.index)
   availability_zone = data.aws_availability_zones.available.names[count.index % length(data.aws_availability_zones.available.names)]
   tags = {
-    Name = "usw${substr(data.aws_availability_zones.available.names[count.index % length(data.aws_availability_zones.available.names)], -2, 2)}-workspaces-svc-subnet"
+    Name        = "usw${substr(data.aws_availability_zones.available.names[count.index % length(data.aws_availability_zones.available.names)], -2, 2)}-workspaces-svc-subnet"
+    application = "workspaces"
   }
 }
 
@@ -211,15 +213,15 @@ resource "aws_route" "workspacesvpc_default_internal_route" {
   ]
 }
 
-########   routing Workspaces to the internet   #############
-resource "aws_route" "workspaces_pvt_default_internet" {
-  route_table_id         = aws_route_table.workspaces_vpc_private_rt.id
-  destination_cidr_block = "0.0.0.0/0"
-  transit_gateway_id     = var.transit_gateway_id
-  depends_on = [
-    aws_ec2_transit_gateway_vpc_attachment.workspaces-vpc
-  ]
-}
+########   WORKSPACES ROUT TO INTERNET   #############
+# resource "aws_route" "workspaces_pvt_default_internet" {
+#   route_table_id         = aws_route_table.workspaces_vpc_private_rt.id
+#   destination_cidr_block = "0.0.0.0/0"
+#   transit_gateway_id     = var.transit_gateway_id
+#   depends_on = [
+#     aws_ec2_transit_gateway_vpc_attachment.workspaces-vpc
+#   ]
+# }
 
 #TODO: uncomment the folloing section after Asstrana team creates AD and provides the DNS IPs
 #####################################################################################
