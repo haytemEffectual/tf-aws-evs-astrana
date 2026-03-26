@@ -60,6 +60,42 @@ variable "map_tag" {
   default     = {}
 }
 
+variable "ws_clients_usernames" {
+  description = "List of usernames for pearsonal WorkSpaces clients"
+  type        = list(string)
+}
 
+variable "enable_personal_workspaces" {
+  description = "Whether to create personal WorkSpaces instances"
+  type        = bool
+  default     = false
+}
 
+variable "user_access_url_sso" {
+  description = "url for user access sso"
+  type        = string
+}
 
+variable "ws_bundle" {
+  type        = string
+  description = "WorkSpaces bundle ID"
+}
+
+variable "workspace_running_mode" {
+  description = "Running mode for WorkSpaces (ALWAYS_ON or AUTO_STOP)"
+  type        = string
+  validation {
+    condition     = can(regex("^(ALWAYS_ON|AUTO_STOP)$", var.workspace_running_mode))
+    error_message = "workspace_running_mode must be either ALWAYS_ON or AUTO_STOP."
+  }
+}
+
+variable "workspace_access_properties" {
+  description = "WorkSpaces access properties defining allowed device types"
+  type        = map(string)
+}
+
+variable "self_service_permissions" {
+  description = "Self-service permissions for WorkSpaces"
+  type        = map(bool)
+}

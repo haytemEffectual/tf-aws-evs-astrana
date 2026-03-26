@@ -57,7 +57,7 @@ jobs:
         run: terraform validate
 
       - name: Trivy - vulnerability scanner for IaC
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@master
         with:
           scan-type: config
           exit-code: 1

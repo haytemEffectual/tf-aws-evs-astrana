@@ -94,7 +94,14 @@ resource "aws_security_group_rule" "workspaces_egress_to_ad_connector" {
 #   description       = "All internet access"
 # }
 
+
+
+
+
+
+
 # Egress: allow HTTPS outbound
+###### Egress rules required for WorkSpaces operation ######
 # trivy:ignore:AVD-AWS-0104
 resource "aws_security_group_rule" "workspaces_egress_https" {
   type              = "egress"
@@ -106,9 +113,74 @@ resource "aws_security_group_rule" "workspaces_egress_https" {
   description       = "HTTPS outbound"
 }
 
+# Egress: allow HTTP outbound
+# trivy:ignore:AVD-AWS-0104
+resource "aws_security_group_rule" "workspaces_egress_http" {
+  type              = "egress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.workspaces.id
+  description       = "HTTP outbound"
+}
+
+# Egress: allow PCoIP streaming UDP 4195
+# trivy:ignore:AVD-AWS-0104
+resource "aws_security_group_rule" "workspaces_egress_udp_4195" {
+  type              = "egress"
+  from_port         = 4195
+  to_port           = 4195
+  protocol          = "udp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.workspaces.id
+  description       = "PCoIP streaming UDP"
+}
+
+# Egress: allow PCoIP UDP 4172
+# trivy:ignore:AVD-AWS-0104
+resource "aws_security_group_rule" "workspaces_egress_udp_4172" {
+  type              = "egress"
+  from_port         = 4172
+  to_port           = 4172
+  protocol          = "udp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.workspaces.id
+  description       = "PCoIP UDP"
+}
+
+# Egress: allow DNS lookups
+# trivy:ignore:AVD-AWS-0104
+resource "aws_security_group_rule" "workspaces_egress_dns_udp" {
+  type              = "egress"
+  from_port         = 53
+  to_port           = 53
+  protocol          = "udp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.workspaces.id
+  description       = "DNS outbound"
+}
+
+
+# Egress: allow HTTP to instance metadata (NAT path)
+# trivy:ignore:AVD-AWS-0104
+resource "aws_security_group_rule" "workspaces_egress_metadata_http" {
+  type              = "egress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["169.254.169.254/32"]
+  security_group_id = aws_security_group.workspaces.id
+  description       = "HTTP to instance metadata"
+}
+
+
+
 #####################################################################################
-################     REGISTER DIRECTORY WITH WORKSPACES       ######################
+################     PERSONAL WORKSPACES  SETUP                   ###################
 #####################################################################################
+
+################    DIRECTORY REGISTRATION -- PERSONAL WORKSPACE  ####################
 resource "aws_workspaces_directory" "main" {
   depends_on = [
     time_sleep.wait_for_ad_connector,
@@ -116,34 +188,41 @@ resource "aws_workspaces_directory" "main" {
     aws_iam_role_policy_attachment.workspaces_default_service_access,
     aws_iam_role_policy_attachment.workspaces_default_self_service_access
   ]
-  directory_id = aws_directory_service_directory.ad_connector.id
-  subnet_ids   = aws_subnet.workspaces_vpc_subnets[*].id
-  #TODO: need to review with Astrana team about actual settings for selfe service permissions on what users can do
-  self_service_permissions {
-    change_compute_type  = true
-    increase_volume_size = true
-    rebuild_workspace    = true
-    restart_workspace    = true
-    switch_running_mode  = true
+  directory_id   = aws_directory_service_directory.ad_connector.id
+  subnet_ids     = aws_subnet.workspaces_vpc_subnets[*].id
+  workspace_type = "PERSONAL"
+  dynamic "self_service_permissions" {
+    for_each = [var.self_service_permissions]
+    content {
+      change_compute_type  = lookup(self_service_permissions.value, "change_compute_type", true)
+      increase_volume_size = lookup(self_service_permissions.value, "increase_volume_size", true)
+      rebuild_workspace    = lookup(self_service_permissions.value, "rebuild_workspace", true)
+      restart_workspace    = lookup(self_service_permissions.value, "restart_workspace", true)
+      switch_running_mode  = lookup(self_service_permissions.value, "switch_running_mode", true)
+    }
   }
-  #TODO: need to review with Astrana team about actual settings for workspace client access devices and permissions 
-  workspace_access_properties {
-    device_type_android    = "ALLOW"
-    device_type_chromeos   = "ALLOW"
-    device_type_ios        = "ALLOW"
-    device_type_linux      = "DENY"
-    device_type_osx        = "ALLOW"
-    device_type_web        = "ALLOW"
-    device_type_windows    = "ALLOW"
-    device_type_zeroclient = "DENY"
+
+  dynamic "workspace_access_properties" {
+    for_each = [var.workspace_access_properties]
+    content {
+      device_type_android    = lookup(workspace_access_properties.value, "device_type_android", "ALLOW")
+      device_type_chromeos   = lookup(workspace_access_properties.value, "device_type_chromeos", "ALLOW")
+      device_type_ios        = lookup(workspace_access_properties.value, "device_type_ios", "ALLOW")
+      device_type_linux      = lookup(workspace_access_properties.value, "device_type_linux", "DENY")
+      device_type_osx        = lookup(workspace_access_properties.value, "device_type_osx", "ALLOW")
+      device_type_web        = lookup(workspace_access_properties.value, "device_type_web", "ALLOW")
+      device_type_windows    = lookup(workspace_access_properties.value, "device_type_windows", "ALLOW")
+      device_type_zeroclient = lookup(workspace_access_properties.value, "device_type_zeroclient", "DENY")
+    }
   }
+
   #TODO: need to review with Astrana team about actual settings for workspace configuration properties.
   workspace_creation_properties {
     custom_security_group_id            = aws_security_group.workspaces.id
     default_ou                          = var.default_ou
     enable_internet_access              = true
-    enable_maintenance_mode             = true
-    user_enabled_as_local_administrator = false
+    enable_maintenance_mode             = true  # maintenance mode allows AWS to perform updates during specified windows
+    user_enabled_as_local_administrator = false # whether to add users as local administrators on their WorkSpaces
   }
   tags = merge(
     {
@@ -154,36 +233,130 @@ resource "aws_workspaces_directory" "main" {
   )
 }
 
-#####################################################################################
-################      WORKSPACES POOL FOR SHARED ACCESS       ######################
-#####################################################################################
+
+################    PERSONAL WORKSPACE INSTANCES  ######################
+data "aws_kms_alias" "workspaces" {
+  name = "alias/aws/workspaces"
+}
+
+resource "aws_workspaces_workspace" "personal_workspace" {
+  count                          = var.enable_personal_workspaces ? length(var.ws_clients_usernames) : 0
+  depends_on                     = [aws_workspaces_directory.main]
+  directory_id                   = aws_directory_service_directory.ad_connector.id
+  bundle_id                      = var.ws_bundle # TODO: need to review with Astrana team about actual bundle ID
+  user_name                      = var.ws_clients_usernames[count.index]
+  root_volume_encryption_enabled = true
+  user_volume_encryption_enabled = true
+  volume_encryption_key          = data.aws_kms_alias.workspaces.target_key_arn # AWS managed key resolved to ARN avoids ForceNew drift
+  #TODO: need to review with Astrana team about actual settings
+  workspace_properties {                 # https://docs.aws.amazon.com/workspaces/latest/api/API_WorkspaceProperties.html
+    compute_type_name    = "PERFORMANCE" # this corresponds to the bundle choice, make sure to choose a compatible bundle and compute type, refer to AWS documentation for details
+    user_volume_size_gib = 50
+    root_volume_size_gib = 80
+    running_mode         = var.workspace_running_mode # "ALWAYS_ON" or "AUTO_STOP"
+
+    # Conditionally evaluates the running_mode value
+    running_mode_auto_stop_timeout_in_minutes = var.workspace_running_mode == "AUTO_STOP" ? 60 : null
+  }
+  tags = merge(
+    {
+      Name        = "${var.ws_clients_usernames[count.index]}-workspace"
+      Environment = "Production"
+    },
+    var.map_tag
+  )
+}
+
+# #####################################################################################
+# ################      WORKSPACES POOL FOR SHARED ACCESS SETUP  ######################
+# #####################################################################################
+
+# ################    DIRECTORY REGISTRATION -- POOL WORKSPACE  ######################
+# resource "aws_workspaces_directory" "pool_directory" {
+#   depends_on = [
+#     time_sleep.wait_for_ad_connector,
+#     aws_iam_role.workspaces_default,
+#     aws_iam_role_policy_attachment.workspaces_default_service_access,
+#     aws_iam_role_policy_attachment.workspaces_default_self_service_access
+#   ]
+
+#   # Subnets must be in different AZs
+#   subnet_ids = aws_subnet.workspaces_vpc_subnets[*].id
+
+#   # Mandatory for Pools
+#   workspace_type                  = "POOLS"
+#   workspace_directory_name        = "workspaces-pool"
+#   workspace_directory_description = "Virtual desktops for the contractors and temporary users"
+
+#   # Identity Management
+#   user_identity_type = "CUSTOMER_MANAGED" # or AWS_IAM_IDENTITY_CENTER
+
+#   active_directory_config {
+#     domain_name                = var.domain_name
+#     service_account_secret_arn = var.ad_connector_creds_secret_arn
+#   }
+
+#     saml_properties {
+#       user_access_url = var.user_access_url_sso
+#       status          = "ENABLED"
+#     }
+#   workspace_creation_properties {
+#     custom_security_group_id            = aws_security_group.workspaces.id
+#     default_ou                          = var.default_ou
+#     enable_internet_access              = false
+#     user_enabled_as_local_administrator = false
+#   }
+
+#   workspace_access_properties {
+#     device_type_android    = "ALLOW"
+#     device_type_chromeos   = "ALLOW"
+#     device_type_ios        = "ALLOW"
+#     device_type_linux      = "DENY"
+#     device_type_osx        = "ALLOW"
+#     device_type_web        = "ALLOW"
+#     device_type_windows    = "ALLOW"
+#     device_type_zeroclient = "DENY"
+#   }
+
+#   tags = merge(
+#     {
+#       Name        = "Pool-of-contractors"
+#       Environment = var.environment
+#     },
+#     var.map_tag
+#   )
+# }
+
+###################################################################
 # # Non-persistent WorkSpaces that can be used by multiple users
 # resource "aws_workspaces_pool" "workspaces_pool" {
 #   pool_name   = "shared-workspaces-pool"
 #   description = "Shared WorkSpaces pool for temporary access and jumpbox use cases"
 
 #   # Bundle and compute configuration
-#   bundle_id = "wsb-bh8rsxt14" # Standard Windows bundle
+#   bundle_id = "wsb-362t3gdrt" # Standard Windows bundle
 
 #   # Directory configuration
 #   directory_id = aws_directory_service_directory.ad_connector.id
 
+#   #TODO: need to review with Astrana team about actual settings
 #   # Capacity settings - number of WorkSpaces in the pool
 #   capacity {
 #     desired_user_sessions = 5 # Adjust based on concurrent user needs
 #   }
 
+#   #TODO: need to review with Astrana team about actual settings
 #   # Application settings
 #   application_settings {
-#     status           = "DISABLED" # Enable if you need application persistence
-#     settings_group   = "" # Optional: S3 bucket for app settings
+#     status         = "DISABLED" # Enable if you need application persistence
+#     settings_group = ""         # Optional: S3 bucket for app settings
 #   }
 
 #   # Timeout settings
 #   timeout_settings {
-#     disconnect_timeout_in_seconds = 900     # 15 minutes idle before disconnect
-#     idle_disconnect_timeout_in_seconds = 600 # 10 minutes idle before marking idle
-#     max_user_duration_in_seconds = 28800   # 8 hours max session
+#     disconnect_timeout_in_seconds      = 900   # 15 minutes idle before disconnect
+#     idle_disconnect_timeout_in_seconds = 600   # 10 minutes idle before marking idle
+#     max_user_duration_in_seconds       = 28800 # 8 hours max session
 #   }
 
 #   tags = merge(
@@ -198,30 +371,5 @@ resource "aws_workspaces_directory" "main" {
 #   depends_on = [aws_workspaces_directory.main]
 # }
 
-#####################################################################################
-################         EXAMPLE PERSONAL WORKSPACE           ######################
-#####################################################################################
-resource "aws_workspaces_workspace" "example" {
-  depends_on                     = [aws_workspaces_directory.main]
-  directory_id                   = aws_directory_service_directory.ad_connector.id
-  bundle_id                      = "wsb-bh8rsxt14" # Standard bundle ID
-  user_name                      = "haytem.alsharif"
-  root_volume_encryption_enabled = true
-  user_volume_encryption_enabled = true
-  volume_encryption_key          = "alias/aws/workspaces" # Uses AWS managed key for WorkSpaces
-  workspace_properties {                                  # https://docs.aws.amazon.com/workspaces/latest/api/API_WorkspaceProperties.html
-    compute_type_name                         = "STANDARD"
-    user_volume_size_gib                      = 50
-    root_volume_size_gib                      = 80
-    running_mode                              = "AUTO_STOP"
-    running_mode_auto_stop_timeout_in_minutes = 60 # Minimum: 60 mins, must be multiple of 60
-  }
-  tags = merge(
-    {
-      Name        = "haytem.alsharif-workspace"
-      Environment = "Production"
-    },
-    var.map_tag
-  )
-}
+
 
