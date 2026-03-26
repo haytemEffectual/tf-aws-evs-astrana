@@ -188,10 +188,9 @@ resource "aws_workspaces_directory" "main" {
     aws_iam_role_policy_attachment.workspaces_default_service_access,
     aws_iam_role_policy_attachment.workspaces_default_self_service_access
   ]
-  directory_id             = aws_directory_service_directory.ad_connector.id
-  subnet_ids               = aws_subnet.workspaces_vpc_subnets[*].id
-  workspace_type           = "PERSONAL"
-  workspace_directory_name = "workspaces-personal"
+  directory_id   = aws_directory_service_directory.ad_connector.id
+  subnet_ids     = aws_subnet.workspaces_vpc_subnets[*].id
+  workspace_type = "PERSONAL"
   dynamic "self_service_permissions" {
     for_each = [var.self_service_permissions]
     content {
