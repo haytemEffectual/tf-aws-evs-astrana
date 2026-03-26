@@ -71,6 +71,16 @@ variable "enable_personal_workspaces" {
   default     = false
 }
 
+variable "user_access_url_sso" {
+  description = "url for user access sso"
+  type        = string
+}
+
+variable "ws_bundle" {
+  type        = string
+  description = "WorkSpaces bundle ID"
+}
+
 
 
 

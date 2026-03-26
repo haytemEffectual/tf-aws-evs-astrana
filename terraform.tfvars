@@ -14,5 +14,8 @@ map_tag                       = { "map-migrated" : "migSHUGRNMVMC" } # this is u
 enable_personal_workspaces    = true
 ws_clients_usernames = [
   "HAlsharif",
-  "JNgo"
-]                               
+  "JNgo",
+  "MCueto"
+]
+user_access_url_sso = "https://launcher.myapps.microsoft.com/api/signin/e348f26f-fa00-4c81-81f3-caf7d427b9ec?tenantId=f9c59c38-400c-4a74-9b2d-d0c26518f803"
+ws_bundle           = "wsb-vz2zm0x4t" # this is the bundle for Windows 10 with 4 vCPU and 16 GB RAM, you can choose other bundles based on your needs, refer to AWS documentation for available bundles and their IDs

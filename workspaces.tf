@@ -236,18 +236,21 @@ resource "aws_workspaces_workspace" "personal_workspace" {
   count                          = var.enable_personal_workspaces ? length(var.ws_clients_usernames) : 0
   depends_on                     = [aws_workspaces_directory.main]
   directory_id                   = aws_directory_service_directory.ad_connector.id
-  bundle_id                      = "wsb-362t3gdrt" # TODO: need to review with Astrana team about actual bundle ID
+  bundle_id                      = var.ws_bundle # TODO: need to review with Astrana team about actual bundle ID
   user_name                      = var.ws_clients_usernames[count.index]
   root_volume_encryption_enabled = true
   user_volume_encryption_enabled = true
   volume_encryption_key          = data.aws_kms_alias.workspaces.target_key_arn # AWS managed key resolved to ARN avoids ForceNew drift
   #TODO: need to review with Astrana team about actual settings
   workspace_properties { # https://docs.aws.amazon.com/workspaces/latest/api/API_WorkspaceProperties.html
-    compute_type_name                         = "STANDARD"
-    user_volume_size_gib                      = 50
-    root_volume_size_gib                      = 80
-    running_mode                              = "AUTO_STOP"
-    running_mode_auto_stop_timeout_in_minutes = 60 # Minimum: 60 mins, must be multiple of 60
+    compute_type_name    = "STANDARD"
+    user_volume_size_gib = 50
+    root_volume_size_gib = 80
+    running_mode         = "ALWAYS_ON" # or AUTO_STOP
+    # setting running_mode_auto_stop_timeout_in_minutes only applies if running_mode is set to AUTO_STOP, 
+    # it defines the timeout for auto-stopping the WorkSpace after user disconnects, minimum is 60 minutes 
+    #and must be a multiple of 60
+    running_mode_auto_stop_timeout_in_minutes = running_mode == "AUTO_STOP" ? 60 : null
   }
   tags = merge(
     {
@@ -276,7 +279,7 @@ resource "aws_workspaces_workspace" "personal_workspace" {
 
 #   # Mandatory for Pools
 #   workspace_type                  = "POOLS"
-#   workspace_directory_name        = "Pool-of-contractors"
+#   workspace_directory_name        = "workspaces-pool"
 #   workspace_directory_description = "Virtual desktops for the contractors and temporary users"
 
 #   # Identity Management
@@ -287,10 +290,14 @@ resource "aws_workspaces_workspace" "personal_workspace" {
 #     service_account_secret_arn = var.ad_connector_creds_secret_arn
 #   }
 
+#     saml_properties {
+#       user_access_url = var.user_access_url_sso
+#       status          = "ENABLED"
+#     }
 #   workspace_creation_properties {
 #     custom_security_group_id            = aws_security_group.workspaces.id
 #     default_ou                          = var.default_ou
-#     enable_internet_access              = true
+#     enable_internet_access              = false
 #     user_enabled_as_local_administrator = false
 #   }
 
@@ -315,7 +322,7 @@ resource "aws_workspaces_workspace" "personal_workspace" {
 # }
 
 ###################################################################
-# Non-persistent WorkSpaces that can be used by multiple users
+# # Non-persistent WorkSpaces that can be used by multiple users
 # resource "aws_workspaces_pool" "workspaces_pool" {
 #   pool_name   = "shared-workspaces-pool"
 #   description = "Shared WorkSpaces pool for temporary access and jumpbox use cases"
