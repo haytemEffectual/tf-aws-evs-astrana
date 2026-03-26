@@ -246,11 +246,10 @@ resource "aws_workspaces_workspace" "personal_workspace" {
     compute_type_name    = "STANDARD"
     user_volume_size_gib = 50
     root_volume_size_gib = 80
-    running_mode         = "ALWAYS_ON" # or AUTO_STOP
-    # setting running_mode_auto_stop_timeout_in_minutes only applies if running_mode is set to AUTO_STOP, 
-    # it defines the timeout for auto-stopping the WorkSpace after user disconnects, minimum is 60 minutes 
-    #and must be a multiple of 60
-    running_mode_auto_stop_timeout_in_minutes = running_mode == "AUTO_STOP" ? 60 : null
+    running_mode         = var.workspace_running_mode # "ALWAYS_ON" or "AUTO_STOP"
+
+    # Conditionally evaluates the running_mode value
+    running_mode_auto_stop_timeout_in_minutes = var.workspace_running_mode == "AUTO_STOP" ? 60 : null
   }
   tags = merge(
     {

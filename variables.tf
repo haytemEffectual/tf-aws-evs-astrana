@@ -81,6 +81,11 @@ variable "ws_bundle" {
   description = "WorkSpaces bundle ID"
 }
 
-
-
-
+variable "workspace_running_mode" {
+  description = "Running mode for WorkSpaces (ALWAYS_ON or AUTO_STOP)"
+  type        = string
+  validation {
+    condition     = can(regex("^(ALWAYS_ON|AUTO_STOP)$", var.workspace_running_mode))
+    error_message = "workspace_running_mode must be either ALWAYS_ON or AUTO_STOP."
+  }
+}
