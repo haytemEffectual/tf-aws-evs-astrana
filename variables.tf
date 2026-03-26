@@ -89,3 +89,13 @@ variable "workspace_running_mode" {
     error_message = "workspace_running_mode must be either ALWAYS_ON or AUTO_STOP."
   }
 }
+
+variable "workspace_access_properties" {
+  description = "WorkSpaces access properties defining allowed device types"
+  type        = map(string)
+}
+
+variable "self_service_permissions" {
+  description = "Self-service permissions for WorkSpaces"
+  type        = map(bool)
+}

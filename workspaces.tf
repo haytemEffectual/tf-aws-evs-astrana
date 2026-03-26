@@ -188,27 +188,35 @@ resource "aws_workspaces_directory" "main" {
     aws_iam_role_policy_attachment.workspaces_default_service_access,
     aws_iam_role_policy_attachment.workspaces_default_self_service_access
   ]
-  directory_id = aws_directory_service_directory.ad_connector.id
-  subnet_ids   = aws_subnet.workspaces_vpc_subnets[*].id
-  #TODO: need to review with Astrana team about actual settings for selfe service permissions on what users can do
-  self_service_permissions {
-    change_compute_type  = true
-    increase_volume_size = true
-    rebuild_workspace    = true
-    restart_workspace    = true
-    switch_running_mode  = true
+  directory_id             = aws_directory_service_directory.ad_connector.id
+  subnet_ids               = aws_subnet.workspaces_vpc_subnets[*].id
+  workspace_type           = "PERSONAL"
+  workspace_directory_name = "workspaces-personal"
+  dynamic "self_service_permissions" {
+    for_each = [var.self_service_permissions]
+    content {
+      change_compute_type  = lookup(self_service_permissions.value, "change_compute_type", true)
+      increase_volume_size = lookup(self_service_permissions.value, "increase_volume_size", true)
+      rebuild_workspace    = lookup(self_service_permissions.value, "rebuild_workspace", true)
+      restart_workspace    = lookup(self_service_permissions.value, "restart_workspace", true)
+      switch_running_mode  = lookup(self_service_permissions.value, "switch_running_mode", true)
+    }
   }
-  #TODO: need to review with Astrana team about actual settings for workspace client access devices and permissions 
-  workspace_access_properties {
-    device_type_android    = "ALLOW"
-    device_type_chromeos   = "ALLOW"
-    device_type_ios        = "ALLOW"
-    device_type_linux      = "DENY"
-    device_type_osx        = "ALLOW"
-    device_type_web        = "ALLOW"
-    device_type_windows    = "ALLOW"
-    device_type_zeroclient = "DENY"
+
+  dynamic "workspace_access_properties" {
+    for_each = [var.workspace_access_properties]
+    content {
+      device_type_android    = lookup(workspace_access_properties.value, "device_type_android", "ALLOW")
+      device_type_chromeos   = lookup(workspace_access_properties.value, "device_type_chromeos", "ALLOW")
+      device_type_ios        = lookup(workspace_access_properties.value, "device_type_ios", "ALLOW")
+      device_type_linux      = lookup(workspace_access_properties.value, "device_type_linux", "DENY")
+      device_type_osx        = lookup(workspace_access_properties.value, "device_type_osx", "ALLOW")
+      device_type_web        = lookup(workspace_access_properties.value, "device_type_web", "ALLOW")
+      device_type_windows    = lookup(workspace_access_properties.value, "device_type_windows", "ALLOW")
+      device_type_zeroclient = lookup(workspace_access_properties.value, "device_type_zeroclient", "DENY")
+    }
   }
+
   #TODO: need to review with Astrana team about actual settings for workspace configuration properties.
   workspace_creation_properties {
     custom_security_group_id            = aws_security_group.workspaces.id
@@ -242,8 +250,8 @@ resource "aws_workspaces_workspace" "personal_workspace" {
   user_volume_encryption_enabled = true
   volume_encryption_key          = data.aws_kms_alias.workspaces.target_key_arn # AWS managed key resolved to ARN avoids ForceNew drift
   #TODO: need to review with Astrana team about actual settings
-  workspace_properties { # https://docs.aws.amazon.com/workspaces/latest/api/API_WorkspaceProperties.html
-    compute_type_name    = "STANDARD"
+  workspace_properties {                 # https://docs.aws.amazon.com/workspaces/latest/api/API_WorkspaceProperties.html
+    compute_type_name    = "PERFORMANCE" # this corresponds to the bundle choice, make sure to choose a compatible bundle and compute type, refer to AWS documentation for details
     user_volume_size_gib = 50
     root_volume_size_gib = 80
     running_mode         = var.workspace_running_mode # "ALWAYS_ON" or "AUTO_STOP"
